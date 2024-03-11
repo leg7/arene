@@ -1,0 +1,6 @@
+
+1. Tu décompactes
+2. Tu descends dans le répertoire créé
+3. Tu fais la commande "cmake ."
+4. Tu fais "make"
+5. Tu fais "./Arene_light
