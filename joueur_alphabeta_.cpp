@@ -16,14 +16,14 @@ std::vector<EtatJeux::Coup> EtatJeux::coupsPossibles() const noexcept
 	std::vector<Coup> coupsPossibles;
 	coupsPossibles.reserve(7);
 
-	const u64 etat = etatOccupation();
-	if (!(etat & MaskCoup1)) coupsPossibles.push_back(Coup1);
-	if (!(etat & MaskCoup2)) coupsPossibles.push_back(Coup2);
-	if (!(etat & MaskCoup3)) coupsPossibles.push_back(Coup3);
-	if (!(etat & MaskCoup4)) coupsPossibles.push_back(Coup4);
-	if (!(etat & MaskCoup5)) coupsPossibles.push_back(Coup5);
-	if (!(etat & MaskCoup6)) coupsPossibles.push_back(Coup6);
-	if (!(etat & MaskCoup7)) coupsPossibles.push_back(Coup7);
+	const u64 etat = ~etatOccupation();
+	if (etat & MaskCoup1) coupsPossibles.push_back(Coup1);
+	if (etat & MaskCoup2) coupsPossibles.push_back(Coup2);
+	if (etat & MaskCoup3) coupsPossibles.push_back(Coup3);
+	if (etat & MaskCoup4) coupsPossibles.push_back(Coup4);
+	if (etat & MaskCoup5) coupsPossibles.push_back(Coup5);
+	if (etat & MaskCoup6) coupsPossibles.push_back(Coup6);
+	if (etat & MaskCoup7) coupsPossibles.push_back(Coup7);
 
 	return coupsPossibles;
 }
