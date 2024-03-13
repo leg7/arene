@@ -3,11 +3,11 @@
 #include "joueur.h"
 #include <cstdint>
 #include <cmath>
-#include <vector>
 
 using u64 = uint64_t;
 using u8 = uint8_t;
 using i32 = int32_t;
+using usize = size_t;
 
 struct EtatJeux
 {
@@ -88,7 +88,8 @@ struct EtatJeux
 	u64 etatOccupation() const noexcept;
 
 	bool coupLicite(const MaskCoup coup) const noexcept;
-	std::vector<Coup> coupsPossibles() const noexcept;
+	u8 coupsPossiblesIf(Coup coupsPossibles[nColonnes]) const noexcept;
+	u8 coupsPossibles(Coup coupsPossibles[nColonnes]) const noexcept;
 
 	// Suppose que le coup est licite
 	void jouer(const NumeroJouer numeroJouer, const Coup coup) noexcept;

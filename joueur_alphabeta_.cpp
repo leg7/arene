@@ -10,22 +10,36 @@ bool EtatJeux::coupLicite(const MaskCoup coup) const noexcept
 	return !(etatOccupation() & coup);
 }
 
-// a ameliorer, voire faire directement dans le alpha beta pour pas passer par un vector inutile
-std::vector<EtatJeux::Coup> EtatJeux::coupsPossibles() const noexcept
+// a ameliorer, voire faire directement dans le alpha beta pour pas passer par un vecteur inutile
+u8 EtatJeux::coupsPossiblesIf(Coup coupsPossibles[nColonnes]) const noexcept
 {
-	std::vector<Coup> coupsPossibles;
-	coupsPossibles.reserve(7);
+	u8 len = 0;
 
-	const u64 etat = ~etatOccupation();
-	if (etat & MaskCoup1) coupsPossibles.push_back(Coup1);
-	if (etat & MaskCoup2) coupsPossibles.push_back(Coup2);
-	if (etat & MaskCoup3) coupsPossibles.push_back(Coup3);
-	if (etat & MaskCoup4) coupsPossibles.push_back(Coup4);
-	if (etat & MaskCoup5) coupsPossibles.push_back(Coup5);
-	if (etat & MaskCoup6) coupsPossibles.push_back(Coup6);
-	if (etat & MaskCoup7) coupsPossibles.push_back(Coup7);
+	const u8 premiereLigne = ~(etatOccupation() & 0x7f);
+	if (premiereLigne & MaskCoup1) coupsPossibles[len++] = Coup1;
+	if (premiereLigne & MaskCoup2) coupsPossibles[len++] = Coup2;
+	if (premiereLigne & MaskCoup3) coupsPossibles[len++] = Coup3;
+	if (premiereLigne & MaskCoup4) coupsPossibles[len++] = Coup4;
+	if (premiereLigne & MaskCoup5) coupsPossibles[len++] = Coup5;
+	if (premiereLigne & MaskCoup6) coupsPossibles[len++] = Coup6;
+	if (premiereLigne & MaskCoup7) coupsPossibles[len++] = Coup7;
 
-	return coupsPossibles;
+	return len;
+}
+
+// Devrait etre meilleurs sur les anciens cpus avec un moins bon predicteur de branche
+u8 EtatJeux::coupsPossibles(Coup coupsPossibles[nColonnes]) const noexcept
+{
+	u8 len = 0;
+	u8 premiereLigne = ~(etatOccupation() & 0x7f);
+
+	while (premiereLigne != 0) {
+		const Coup coup = static_cast<Coup>(__builtin_ctz(premiereLigne));
+		coupsPossibles[len++] = coup;
+		premiereLigne &= ~(1 << coup);
+	}
+
+	return len;
 }
 
 void EtatJeux::jouer(const NumeroJouer numeroJouer, const Coup coup) noexcept
