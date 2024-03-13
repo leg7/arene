@@ -7,7 +7,7 @@ u64 EtatJeux::etatOccupation() const noexcept
 
 bool EtatJeux::coupLicite(const MaskCoup coup) const noexcept
 {
-	return etatOccupation() & coup;
+	return !(etatOccupation() & coup);
 }
 
 std::vector<EtatJeux::Coup> EtatJeux::coupsPossibles() const noexcept

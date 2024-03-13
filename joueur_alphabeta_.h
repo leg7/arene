@@ -84,7 +84,7 @@ struct EtatJeux
 
 	NumeroJouer jouerCourant = j0;
 
-	// retourne un bitmap des cases occupes (1) libres (0)
+	// retourne un bitmap des cases occupes par les deux jouers (1), et les cases libres (0)
 	u64 etatOccupation() const noexcept;
 
 	bool coupLicite(const MaskCoup coup) const noexcept;
