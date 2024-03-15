@@ -3,6 +3,7 @@
 #include <mutex>
 
 #include "arbitre.h"
+#include "objects/jeu.h"
 
 using namespace std;
 
@@ -18,6 +19,22 @@ int main()
 
     EtatJeux e;
     e.test();
+
+    // Jeu j(9999);
+    //
+    // srand(time(NULL));
+    // while (!j.fini()) {
+	   //  int coup = rand()%14 - 14/2;
+	   //  j.joue(coup);
+	   //  j.plateau()->afficher(std::cout);
+    // }
+    // for (i32 i = -7; i <= 7; ++i) {
+	   //  std::cout << "Coup licite : " << i << " " << std::boolalpha << j.coup_licite(i) << std::endl;
+	   //  j.joue(i);
+	   //  j.plateau()->afficher(std::cout);
+    // }
+
+
 
     return 0;
 }
