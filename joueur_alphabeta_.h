@@ -77,13 +77,13 @@ struct EtatJeux
 
 
 	// index de jouers
-	enum NumeroJouer: u8
+	enum NumeroJoueur: u8
 	{
 		j0 = 0,
 		j1 = 1,
 	};
 	u64 joueurs[2] = { 0, 0 };
-	NumeroJouer joueurCourant = j0;
+	NumeroJoueur joueurCourant = j0;
 
 	EtatJeux();
 	EtatJeux(const EtatJeux &j);
@@ -105,7 +105,7 @@ struct EtatJeux
 
 	i32 estimation() const noexcept;
 
-	bool estGagnant(NumeroJouer num)const;
+	bool estGagnant(NumeroJoueur num)const;
 	i32 valeurCoup() const noexcept;
 
 };

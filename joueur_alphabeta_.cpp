@@ -86,20 +86,17 @@ void EtatJeux::jouer(const Coup coup) noexcept
 		}
 	}
 
-	joueurCourant = static_cast<NumeroJouer>(joueurCourant ^ 1);
+	joueurCourant = static_cast<NumeroJoueur>(joueurCourant ^ 1);
 }
 
-bool EtatJeux::estGagnant(NumeroJouer num)const{
+bool EtatJeux::estGagnant(NumeroJoueur num)const{
 	u64 sauvegarde=joueurs[num]<<__builtin_clzl(joueurs[num]);
 	u64 etat=joueurs[num]<<__builtin_clzl(joueurs[num]);
 	for (int i=0;i<7;i++){
-		if ((etat&0xF0'00'00'00'00'00'00'00)==0xF0'00'00'00'00'00'00'00) return true;
-
-		else if ((etat&0x78'00'00'00'00'00'00'00)==0x78'00'00'00'00'00'00'00) return true;
-
-		else if ((etat&0x3C'00'00'00'00'00'00'00)==0x3C'00'00'00'00'00'00'00) return true;
-
-		else if ((etat&0x1E'00'00'00'00'00'00'00)==0x1E'00'00'00'00'00'00'00) return true;
+		if ((etat & 0xF0'00'00'00'00'00'00'00)==0xF0'00'00'00'00'00'00'00) return true;
+		else if ((etat & 0x78'00'00'00'00'00'00'00)==0x78'00'00'00'00'00'00'00) return true;
+		else if ((etat & 0x3C'00'00'00'00'00'00'00)==0x3C'00'00'00'00'00'00'00) return true;
+		else if ((etat & 0x1E'00'00'00'00'00'00'00)==0x1E'00'00'00'00'00'00'00) return true;
 
 		etat<<=7;
 	}
@@ -123,7 +120,7 @@ bool EtatJeux::estGagnant(NumeroJouer num)const{
 
 i32 EtatJeux::valeurCoup() const noexcept{
 	if (estGagnant(joueurCourant)) return 10000;
-	else if (estGagnant(static_cast<NumeroJouer>(joueurCourant ^1))) return -10000;
+	else if (estGagnant(static_cast<NumeroJoueur>(joueurCourant ^1))) return -10000;
 	else{
 
 		return 14;
