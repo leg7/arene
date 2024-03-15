@@ -31,6 +31,13 @@ struct EtatJeux
 
 	// Fonctionne comme un mask pour extraire la valeure de la premiere ligne
 	// a la colonne n pour verifier si le coup est licite
+	// 0000000000000000000000000000000000000000000000000000000000000001
+	// 0000000000000000000000000000000000000000000000000000000000000010
+	// 0000000000000000000000000000000000000000000000000000000000000100
+	// 0000000000000000000000000000000000000000000000000000000000001000
+	// 0000000000000000000000000000000000000000000000000000000000010000
+	// 0000000000000000000000000000000000000000000000000000000000100000
+	// 0000000000000000000000000000000000000000000000000000000001000000
 	enum MaskCoup: u64
 	{
 		MaskCoup1 = 1,
@@ -43,6 +50,12 @@ struct EtatJeux
 	};
 
 	static constexpr const u64 nLignes = 6;
+	// 0000000000000000000000000000000000000000000000000000000001111111
+	// 0000000000000000000000000000000000000000000000000011111110000000
+	// 0000000000000000000000000000000000000000000111111100000000000000
+	// 0000000000000000000000000000000000001111111000000000000000000000
+	// 0000000000000000000000000000011111110000000000000000000000000000
+	// 0000000000000000000000111111100000000000000000000000000000000000
 	static constexpr const u64 maskLigne[nLignes] = {
 		127,          // (2^0 + 2^1 + 2^2 + 2^3 + 2^4 + 2^5 + 2^6) Voire exemple ci-dessus
 		16256,        // (2^7 + 2^8 + 2^9 + 2^10 + 2^11 + 2^12 + 2^13)
@@ -64,6 +77,13 @@ struct EtatJeux
 		Coup7,
 	};
 	static constexpr const u64 nColonnes = 7;
+	// 0000000000000000000000000000100000010000001000000100000010000001
+	// 0000000000000000000000000001000000100000010000001000000100000010
+	// 0000000000000000000000000010000001000000100000010000001000000100
+	// 0000000000000000000000000100000010000001000000100000010000001000
+	// 0000000000000000000000001000000100000010000001000000100000010000
+	// 0000000000000000000000010000001000000100000010000001000000100000
+	// 0000000000000000000000100000010000001000000100000010000001000000
 	static constexpr const u64 maskColonne[nColonnes] = {
 		34'630'287'489, // (2^0 + 2^7 + 2^14 + 2^21 + 2^28 + 2^35)
 		34'630'287'489 << 1,
@@ -75,14 +95,14 @@ struct EtatJeux
 	};
 
 	// index de jouers
-	enum NumeroJouer: u8
+	enum NumeroJoueur: u8
 	{
 		j0 = 0,
 		j1 = 1,
 	};
-	u64 jouers[2] = { 0, 0 };
+	u64 joueurs[2] = { 0, 0 };
 
-	NumeroJouer jouerCourant = j0;
+	NumeroJoueur joueurCourant = j0;
 
 	// retourne un bitmap des cases occupes par les deux jouers (1), et les cases libres (0)
 	u64 etatOccupation() const noexcept;
@@ -92,16 +112,19 @@ struct EtatJeux
 	u8 coupsPossibles(Coup coupsPossibles[nColonnes]) const noexcept;
 
 	// Suppose que le coup est licite
-	void jouer(const NumeroJouer numeroJouer, const Coup coup) noexcept;
+	void jouer(const NumeroJoueur numeroJoueur, const Coup coup) noexcept;
 
 	i32 valeureCoup(const Coup coup) const noexcept;
 };
 
 class Joueur_AlphaBeta_ : public Joueur
 {
+private:
+	std::vector<int> _listCoup;
 public:
   Joueur_AlphaBeta_(std::string nom, bool joueur);
   char nom_abbrege() const override;
 
-  void recherche_coup(Jeu, int & coup) override;
+  void recherche_coup(Jeu j, int & coup) override;
+	i32 alpha_beta(EtatJeux etat_jeu, i32 alpha, i32 beta, bool isMax);
 };

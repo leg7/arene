@@ -32,7 +32,7 @@ public:
 
     /**
      * @brief jouer
-     * @param jeu 
+     * @param jeu
      * @param coup : le coup doit etre modifié par le joueur avant la fin du temps imparti
      * @param coup_mutex : le mutex doit etre pris par le joueur au début de la partie puis rendu avant le temps imparti
      */
