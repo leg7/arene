@@ -104,6 +104,7 @@ struct EtatJeux
 	void test() noexcept;
 
 	i32 valeurCoup(const Coup coup) const noexcept;
+	i32 estimation() const noexcept;
 };
 
 class Joueur_AlphaBeta_ : public Joueur
@@ -113,5 +114,5 @@ public:
   char nom_abbrege() const override;
 
   void recherche_coup(Jeu, int & coup) override;
-	i32 alpha_beta(u8 profondeur, EtatJeux etat_jeu, i32 alpha, i32 beta, bool isMax);
+  i32 alpha_beta(const u8 profondeur, const EtatJeux &etat_jeu, i32 alpha, i32 beta, const bool isMax);
 };

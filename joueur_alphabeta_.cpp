@@ -150,6 +150,10 @@ void EtatJeux::test() noexcept
 	printf("\n");
 }
 
+i32 EtatJeux::estimation() const noexcept
+{
+
+}
 
 
 Joueur_AlphaBeta_::Joueur_AlphaBeta_(std::string nom, bool joueur)
@@ -165,21 +169,17 @@ char Joueur_AlphaBeta_::nom_abbrege() const
 
 void Joueur_AlphaBeta_::recherche_coup(Jeu j, int &coup)
 {
-	// TODO : comment passer de Jeu à notre propre structure EtatJeu?
-	EtatJeux etat_jeux(j);
-
-	// TODO : Si 1ere ligne 4eme colonne vide, on pose le jeton ?
-
 	u8 profondeur = 4;
 	i32 meilleur_score = INT32_MIN;
 	i32 score;
 	int meilleur_coup;
-	Coup listCoupsPossibles[nColonnes];
+	EtatJeux etat_jeux;
+	EtatJeux::Coup listCoupsPossibles[EtatJeux::nCoups];
 	u8 taille = etat_jeux.coupsPossibles(listCoupsPossibles);
 
 	for (u8 i = 0; i < taille; ++i) {
-		EtatJeux tmp = etat_jeux;
-		tmp.jouer(j0, listCoupsPossibles[i]);
+		EtatJeux tmp(etat_jeux);
+		tmp.jouer(listCoupsPossibles[i]);
 		score = alpha_beta(profondeur, tmp, INT32_MIN, INT32_MAX, true);
 		if (meilleur_score < score) {
 			meilleur_score = score;
@@ -189,26 +189,27 @@ void Joueur_AlphaBeta_::recherche_coup(Jeu j, int &coup)
 	coup = meilleur_coup;
 }
 
-Joueur_AlphaBeta_::alpha_beta(EtatJeux etat_jeux, i32 alpha, i32 beta, bool isMax) {
+i32 Joueur_AlphaBeta_::alpha_beta(const u8 profondeur, const EtatJeux &etat_jeux, i32 alpha, i32 beta, const bool isMax) {
 	//TODO : faire l'estimateur pour l'etat du jeu
 	if (profondeur <= 0) return etat_jeux.estimation();
 
  	i32 score;
 
+	EtatJeux::Coup listCoupsPossibles[EtatJeux::nColonnes];
+	u8 taille = etat_jeux.coupsPossibles(listCoupsPossibles);
+
 	// TODO : faire la fonction de test si le jeu est fini.
-	if (etat_jeux.est_fini()) {
+	bool jeuxTermine = taille == 0;
+	if (jeuxTermine) {
 		return etat_jeux.estimation();
 	}
-
-	Coup listCoupsPossibles[nColonnes];
-	u8 taille = etat_jeux.coupsPossibles(listCoupsPossibles);
 
 	if (isMax) {
 		score = INT32_MIN;
 
 		for (u8 i = 0; i < taille; ++i) {
-			EtatJeux tmp = etat_jeux;
-			tmp.jouer(joueurCourant, listCoupsPossibles[i]);
+			EtatJeux tmp(etat_jeux);
+			tmp.jouer(listCoupsPossibles[i]);
 			score = std::max(score, alpha_beta(profondeur-1, tmp, alpha, beta, false));
 
 			// Beta coupure
@@ -223,9 +224,9 @@ Joueur_AlphaBeta_::alpha_beta(EtatJeux etat_jeux, i32 alpha, i32 beta, bool isMa
 	} else {
 		score = INT32_MAX;
 
-		for (auto coup : etat_jeux.coupsPossibles()) {
-			EtatJeux tmp = etat_jeux;
-			tmp.jouer(joueurCourant, listCoupsPossibles[i]);
+		for (u8 i = 0; i < taille; ++i) {
+			EtatJeux tmp(etat_jeux);
+			tmp.jouer(listCoupsPossibles[i]);
 			score = std::min(score, alpha_beta(profondeur-1, etat_jeux, alpha, beta, true));
 
 			// Alpha coupure
@@ -234,7 +235,7 @@ Joueur_AlphaBeta_::alpha_beta(EtatJeux etat_jeux, i32 alpha, i32 beta, bool isMa
 			}
 
 			if (score < beta) {
-				beta = score
+				beta = score;
 			}
 		}
 	}
