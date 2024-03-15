@@ -83,8 +83,11 @@ struct EtatJeux
 		j1 = 1,
 	};
 	u64 joueurs[2] = { 0, 0 };
-
 	NumeroJouer joueurCourant = j0;
+
+	EtatJeux();
+	EtatJeux(const EtatJeux &j);
+	EtatJeux& operator=(const EtatJeux &j);
 
 	// retourne un bitmap des cases occupes par les deux jouers (1), et les cases libres (0)
 	u64 etatOccupation() const noexcept;

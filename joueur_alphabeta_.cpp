@@ -1,5 +1,27 @@
 #include "joueur_alphabeta_.h"
 
+EtatJeux::EtatJeux():
+	joueurCourant(j0)
+{
+	joueurs[0] = 0;
+	joueurs[1] = 0;
+}
+
+EtatJeux::EtatJeux(const EtatJeux &j)
+{
+	joueurs[0] = j.joueurs[0];
+	joueurs[1] = j.joueurs[1];
+	joueurCourant = j.joueurCourant;
+}
+
+// EtatJeux::EtatJeux& operator=(const EtatJeux &j)
+// {
+// 	joueurs[0] = j.joueurs[0];
+// 	joueurs[1] = j.joueurs[1];
+// 	joueurCourant = j.joueurCourant;
+// 	return *this;
+// }
+
 u64 EtatJeux::etatOccupation() const noexcept
 {
 	return joueurs[0] | joueurs[1];
