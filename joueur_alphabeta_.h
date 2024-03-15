@@ -96,9 +96,8 @@ struct EtatJeux
 	u8 coupsPossiblesIf(Coup coupsPossibles[nCoups]) const noexcept;
 	u8 coupsPossibles(Coup coupsPossibles[nCoups]) const noexcept;
 
-
 	// Suppose que le coup est licite
-	void jouer(const NumeroJouer numeroJoueur, const Coup coup) noexcept;
+	void jouer(const Coup coup) noexcept;
 
 	void afficher() const noexcept;
 	void afficherBits(const u64 joueur) const noexcept;

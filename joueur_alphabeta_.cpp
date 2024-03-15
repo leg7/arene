@@ -44,6 +44,8 @@ u8 EtatJeux::coupsPossiblesIf(Coup coupsPossibles[nCoups]) const noexcept
 	if (premiereLigne == 0) {
 		coupsPossibles = toutPossible;
 		return nCoups;
+	} else if (premiereLigne == 127) {
+		return 0;
 	}
 
 	premiereLigne = ~premiereLigne;
@@ -73,13 +75,13 @@ u8 EtatJeux::coupsPossibles(Coup coupsPossibles[nCoups]) const noexcept
 	return len;
 }
 
-void EtatJeux::jouer(const NumeroJouer numeroJouer, const Coup coup) noexcept
+void EtatJeux::jouer(const Coup coup) noexcept
 {
 	const u64 etat = etatOccupation() & maskColonne[coup];
 
 	for (u8 ligne = nLignes - 1; ligne >= 0; --ligne) {
 		if ((etat & maskLigne[ligne]) == 0) {
-			joueurs[numeroJouer] |= 1UL << (coup + ligne * 7);
+			joueurs[joueurCourant] |= 1UL << (coup + ligne * 7);
 			break;
 		}
 	}
@@ -138,7 +140,7 @@ void EtatJeux::test() noexcept
 
 		printf("-------------------------------------------------------\n\n");
 		printf("Jouer %d joue en %zu\n\n", joueurCourant, c + 1);
-		jouer(joueurCourant, c);
+		jouer(c);
 		afficher();
 		afficherBits(joueurs[0]);
 		afficherBits(joueurs[1]);
