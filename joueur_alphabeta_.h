@@ -106,6 +106,10 @@ struct EtatJeux
 	i32 estimation() const noexcept;
 
 	bool estGagnant(NumeroJoueur num)const;
+
+
+	int nbPiecesConsecutives(NumeroJoueur num)const;
+
 	i32 valeurCoup() const noexcept;
 
 };

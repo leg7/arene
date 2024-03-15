@@ -117,15 +117,53 @@ bool EtatJeux::estGagnant(NumeroJoueur num)const{
 }
 
 
+int EtatJeux::nbPiecesConsecutives(NumeroJoueur num)const{
+	u64 sauvegarde=joueurs[num];
+	int nb_pieces_consecutives(0);
+	for (int i=0;i<nLignes;i++){
+		u64
+	masque=(maskLigne[i]&sauvegarde)<<(22+nColonnes*i);
+		do{
+		masque<<=__builtin_clzl(masque);
+		int pieces=__builtin_clrsbl(masque);
+		nb_pieces_consecutives+=pieces;
+		masque<<pieces+1;
+		}
+
+		while (masque!=0);
+	}
+
+	int piece_consecutives_col[nColonnes] ={0};
+
+		for (int i=0;i<nLignes;i++){
+			bool start_seq=false;
+			for (int j=0;j<nCoups;j++){
+				if (!start_seq and sauvegarde&maskCoup[j] == 1) start_seq=true;
+				else if (start_seq and sauvegarde&maskCoup[j] == 1) piece_consecutives_col[j]++;
+				else if (sauvegarde&maskCoup[j] == 0) start_seq=false;
+			}
+		}
+
+	for (int i=0;i<nColonnes;i++){
+		nb_pieces_consecutives+=piece_consecutives_col[i];
+	}
+
+	return nb_pieces_consecutives;
+}
+
+
+
+
+
+
+
 
 i32 EtatJeux::valeurCoup() const noexcept{
 	if (estGagnant(joueurCourant)) return 10000;
 	else if (estGagnant(static_cast<NumeroJoueur>(joueurCourant ^1))) return -10000;
 	else{
-
 		return 14;
 	}
-
 }
 
 

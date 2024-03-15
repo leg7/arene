@@ -17,8 +17,8 @@ int main()
     // commence le challenge
     // a.challenge();
 
-    EtatJeux e;
-    e.test();
+    /*EtatJeux e;
+    e.test();*/
 
     // Jeu j(9999);
     //
