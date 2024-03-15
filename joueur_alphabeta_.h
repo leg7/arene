@@ -116,10 +116,13 @@ struct EtatJeux
 
 class Joueur_AlphaBeta_ : public Joueur
 {
+private:
+	EtatJeux _etat_jeux;
+
 public:
   Joueur_AlphaBeta_(std::string nom, bool joueur);
   char nom_abbrege() const override;
 
-  void recherche_coup(Jeu, int & coup) override;
+  void recherche_coup(Jeu j, int & coup) override;
   i32 alpha_beta(const u8 profondeur, const EtatJeux &etat_jeu, i32 alpha, i32 beta, const bool isMax);
 };

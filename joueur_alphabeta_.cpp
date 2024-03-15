@@ -121,8 +121,7 @@ int EtatJeux::nbPiecesConsecutives(NumeroJoueur num)const{
 	u64 sauvegarde=joueurs[num];
 	int nb_pieces_consecutives(0);
 	for (int i=0;i<nLignes;i++){
-		u64
-	masque=(maskLigne[i]&sauvegarde)<<(22+nColonnes*i);
+		u64 masque=(maskLigne[i]&sauvegarde)<<(22+nColonnes*i);
 		do{
 		masque<<=__builtin_clzl(masque);
 		int pieces=__builtin_clrsbl(masque);
@@ -232,7 +231,7 @@ void EtatJeux::test() noexcept
 
 i32 EtatJeux::estimation() const noexcept
 {
-
+	return 0;
 }
 
 
@@ -249,16 +248,18 @@ char Joueur_AlphaBeta_::nom_abbrege() const
 
 void Joueur_AlphaBeta_::recherche_coup(Jeu j, int &coup)
 {
+	// Joue le coup de l'adversaire pour actualiser notre plateau
+	_etat_jeux.jouer(static_cast<EtatJeux::Coup>(coup));
+
 	u8 profondeur = 4;
 	i32 meilleur_score = INT32_MIN;
 	i32 score;
-	int meilleur_coup;
-	EtatJeux etat_jeux;
+	EtatJeux::Coup meilleur_coup;
 	EtatJeux::Coup listCoupsPossibles[EtatJeux::nCoups];
-	u8 taille = etat_jeux.coupsPossibles(listCoupsPossibles);
+	u8 taille = _etat_jeux.coupsPossibles(listCoupsPossibles);
 
 	for (u8 i = 0; i < taille; ++i) {
-		EtatJeux tmp(etat_jeux);
+		EtatJeux tmp(_etat_jeux);
 		tmp.jouer(listCoupsPossibles[i]);
 		score = alpha_beta(profondeur, tmp, INT32_MIN, INT32_MAX, true);
 		if (meilleur_score < score) {
@@ -266,10 +267,15 @@ void Joueur_AlphaBeta_::recherche_coup(Jeu j, int &coup)
 			meilleur_coup = listCoupsPossibles[i];
 		}
 	}
-	coup = meilleur_coup;
+	// Joue notre coup pour actualiser notre plateau avant de rendre le mutex
+	_etat_jeux.jouer(meilleur_coup);
+	coup = static_cast<int>(meilleur_coup);
 }
 
 i32 Joueur_AlphaBeta_::alpha_beta(const u8 profondeur, const EtatJeux &etat_jeux, i32 alpha, i32 beta, const bool isMax) {
+	//TODO : chronometre pour finir à 9,5 milisecondre
+
+
 	//TODO : faire l'estimateur pour l'etat du jeu
 	if (profondeur <= 0) return etat_jeux.estimation();
 
@@ -283,6 +289,7 @@ i32 Joueur_AlphaBeta_::alpha_beta(const u8 profondeur, const EtatJeux &etat_jeux
 	if (jeuxTermine) {
 		return etat_jeux.estimation();
 	}
+
 
 	if (isMax) {
 		score = INT32_MIN;
