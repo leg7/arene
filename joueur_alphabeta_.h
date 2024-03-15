@@ -103,8 +103,11 @@ struct EtatJeux
 	void afficherBits(const u64 joueur) const noexcept;
 	void test() noexcept;
 
-	i32 valeurCoup(const Coup coup) const noexcept;
 	i32 estimation() const noexcept;
+
+	bool estGagnant(NumeroJouer num)const;
+	i32 valeurCoup() const noexcept;
+
 };
 
 class Joueur_AlphaBeta_ : public Joueur

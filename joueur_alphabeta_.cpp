@@ -89,6 +89,51 @@ void EtatJeux::jouer(const Coup coup) noexcept
 	joueurCourant = static_cast<NumeroJouer>(joueurCourant ^ 1);
 }
 
+bool EtatJeux::estGagnant(NumeroJouer num)const{
+	u64 sauvegarde=joueurs[num]<<__builtin_clzl(joueurs[num]);
+	u64 etat=joueurs[num]<<__builtin_clzl(joueurs[num]);
+	for (int i=0;i<7;i++){
+		if ((etat&0xF0'00'00'00'00'00'00'00)==0xF0'00'00'00'00'00'00'00) return true;
+
+		else if ((etat&0x78'00'00'00'00'00'00'00)==0x78'00'00'00'00'00'00'00) return true;
+
+		else if ((etat&0x3C'00'00'00'00'00'00'00)==0x3C'00'00'00'00'00'00'00) return true;
+
+		else if ((etat&0x1E'00'00'00'00'00'00'00)==0x1E'00'00'00'00'00'00'00) return true;
+
+		etat<<=7;
+	}
+		u64 masque1=2113665;
+		u64 masque2=270549120;
+		u64 masque3=34630287360;
+
+		for (int i=0;i<6;i++){
+			if ((sauvegarde&masque1)==masque1) return true;
+			else if ((sauvegarde&masque2)==masque2) return true;
+			else if ((sauvegarde&masque3)==masque3) return true;
+			masque1<<=1;
+			masque2<<=1;
+			masque3<<=1;
+		}
+
+		return 0;
+}
+
+
+
+i32 EtatJeux::valeurCoup() const noexcept{
+	if (estGagnant(joueurCourant)) return 10000;
+	else if (estGagnant(static_cast<NumeroJouer>(joueurCourant ^1))) return -10000;
+	else{
+
+		return 14;
+	}
+
+}
+
+
+
+
 void EtatJeux::afficherBits(const u64 val) const noexcept
 {
 	printf("%zu\t:\t", val);
