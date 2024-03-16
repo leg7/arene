@@ -108,7 +108,7 @@ void EtatJeux::jouer(const Coup coup) noexcept
 bool EtatJeux::estGagnant(NumeroJoueur num)const{
 	u64 etat = joueurs[num] << 22;
 
-	for (int i = 0; i < nCoups; i++) {
+	for (u64 i = 0; i < nCoups; i++) {
  		if ((etat & 0xF0'00'00'00'00'00'00'00) == 0xF0'00'00'00'00'00'00'00) {
 			return true;
 		} else if ((etat & 0x78'00'00'00'00'00'00'00) == 0x78'00'00'00'00'00'00'00) {
@@ -126,7 +126,7 @@ bool EtatJeux::estGagnant(NumeroJoueur num)const{
 	u64 masque2 = 270549120;
 	u64 masque3 = 34630287360;
 
-	for (int i = 0; i < nColonnes; i++) {
+	for (u64 i = 0; i < nColonnes; i++) {
 		if ((joueurs[num] & masque1) == masque1) return true;
 		else if ((joueurs[num] & masque2) == masque2) return true;
 		else if ((joueurs[num] & masque3) == masque3) return true;
