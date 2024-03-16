@@ -104,14 +104,9 @@ struct EtatJeux
 	void test() noexcept;
 
 	i32 estimation() const noexcept;
-
 	bool estGagnant(NumeroJoueur num)const;
 
-
 	int nbPiecesConsecutives(NumeroJoueur num)const;
-
-	i32 valeurCoup() const noexcept;
-
 };
 
 class Joueur_AlphaBeta_ : public Joueur

@@ -1,5 +1,21 @@
 #include "joueur_alphabeta_.h"
 
+void afficher64Bits(const u64 val)
+{
+	printf("%zu\t:\t", val);
+	u64 mask = 0x8000'0000'0000'0000;
+
+	for (u8 i = 0; i < 16; ++i) {
+		for (u8 j = 0; j < 4; ++j) {
+			printf("%d", val & mask ? 1 : 0);
+			mask >>= 1;
+		}
+		printf(" ");
+	}
+
+	printf("\n");
+}
+
 EtatJeux::EtatJeux():
 	joueurCourant(j0)
 {
@@ -90,83 +106,83 @@ void EtatJeux::jouer(const Coup coup) noexcept
 }
 
 bool EtatJeux::estGagnant(NumeroJoueur num)const{
-	u64 sauvegarde=joueurs[num]<<__builtin_clzl(joueurs[num]);
-	u64 etat=joueurs[num]<<__builtin_clzl(joueurs[num]);
-	for (int i=0;i<7;i++){
-		if ((etat & 0xF0'00'00'00'00'00'00'00)==0xF0'00'00'00'00'00'00'00) return true;
-		else if ((etat & 0x78'00'00'00'00'00'00'00)==0x78'00'00'00'00'00'00'00) return true;
-		else if ((etat & 0x3C'00'00'00'00'00'00'00)==0x3C'00'00'00'00'00'00'00) return true;
-		else if ((etat & 0x1E'00'00'00'00'00'00'00)==0x1E'00'00'00'00'00'00'00) return true;
+	u64 etat = joueurs[num] << 22;
 
-		etat<<=7;
-	}
-		u64 masque1=2113665;
-		u64 masque2=270549120;
-		u64 masque3=34630287360;
-
-		for (int i=0;i<6;i++){
-			if ((sauvegarde&masque1)==masque1) return true;
-			else if ((sauvegarde&masque2)==masque2) return true;
-			else if ((sauvegarde&masque3)==masque3) return true;
-			masque1<<=1;
-			masque2<<=1;
-			masque3<<=1;
+	for (int i = 0; i < nCoups; i++) {
+ 		if ((etat & 0xF0'00'00'00'00'00'00'00) == 0xF0'00'00'00'00'00'00'00) {
+			return true;
+		} else if ((etat & 0x78'00'00'00'00'00'00'00) == 0x78'00'00'00'00'00'00'00) {
+			return true;
+		} else if ((etat & 0x3C'00'00'00'00'00'00'00) == 0x3C'00'00'00'00'00'00'00) {
+			return true;
+		} else if ((etat & 0x1E'00'00'00'00'00'00'00) == 0x1E'00'00'00'00'00'00'00) {
+			return true;
 		}
 
-		return 0;
+		etat <<= nCoups;
+	}
+
+	u64 masque1 = 2113665;
+	u64 masque2 = 270549120;
+	u64 masque3 = 34630287360;
+
+	for (int i = 0; i < nColonnes; i++) {
+		if ((joueurs[num] & masque1) == masque1) return true;
+		else if ((joueurs[num] & masque2) == masque2) return true;
+		else if ((joueurs[num] & masque3) == masque3) return true;
+		masque1 <<= 1;
+		masque2 <<= 1;
+		masque3 <<= 1;
+	}
+
+	return 0;
 }
 
-
 int EtatJeux::nbPiecesConsecutives(NumeroJoueur num)const{
-	u64 sauvegarde=joueurs[num];
-	int nb_pieces_consecutives(0);
-	for (int i=0;i<nLignes;i++){
-		u64 masque=(maskLigne[i]&sauvegarde)<<(22+nColonnes*i);
-		do{
-		masque<<=__builtin_clzl(masque);
-		int pieces=__builtin_clrsbl(masque);
-		nb_pieces_consecutives+=pieces;
-		masque<<pieces+1;
-		}
+	int nb_pieces_consecutives = 0;
 
-		while (masque!=0);
+	for (u64 ligne = 0; ligne < nLignes; ligne++){
+		u64 masque = (maskLigne[ligne] & joueurs[num]) << 22;
+		while (masque != 0) {
+			masque <<= __builtin_clzl(masque);
+			int pieces = __builtin_clrsbl(masque);
+			nb_pieces_consecutives += pieces * 2;
+			masque <<= pieces+1;
+		}
 	}
 
-	int piece_consecutives_col[nColonnes] ={0};
-
-		for (int i=0;i<nLignes;i++){
-			bool start_seq=false;
-			for (int j=0;j<nCoups;j++){
-				if (!start_seq and sauvegarde&maskCoup[j] == 1) start_seq=true;
-				else if (start_seq and sauvegarde&maskCoup[j] == 1) piece_consecutives_col[j]++;
-				else if (sauvegarde&maskCoup[j] == 0) start_seq=false;
+	for (u64 col = 0; col < nColonnes; col++){
+		bool start_seq=false;
+		u64 bits = joueurs[num];
+		for (u64 i = 0; i < nLignes; i++) {
+			if (start_seq == false && (bits & maskCoup[col]) >= 1) {
+				start_seq = true;
+			} else if (start_seq && (bits & maskCoup[col]) >= 1) {
+				nb_pieces_consecutives++;
+			} else /* if ((joueurs[num] & maskCoup[j]) == 0) */ {
+				start_seq = false;
 			}
-		}
 
-	for (int i=0;i<nColonnes;i++){
-		nb_pieces_consecutives+=piece_consecutives_col[i];
+			bits >>= nCoups;
+		}
 	}
 
 	return nb_pieces_consecutives;
 }
 
-
-
-
-
-
-
-
-i32 EtatJeux::valeurCoup() const noexcept{
-	if (estGagnant(joueurCourant)) return 10000;
-	else if (estGagnant(static_cast<NumeroJoueur>(joueurCourant ^1))) return -10000;
-	else{
-		return 14;
+i32 EtatJeux::estimation() const noexcept{
+	if (estGagnant(j0)) {
+		return 10000;
+	} else if (estGagnant(static_cast<NumeroJoueur>(j1))) {
+		return -10000;
+	} else {
+		int nb0 = nbPiecesConsecutives(joueurCourant);
+		int nb1 = nbPiecesConsecutives(static_cast<EtatJeux::NumeroJoueur>(joueurCourant ^ 1));
+		printf("Estimation j0: %d\n", nb0);
+		printf("Estimation j1: %d\n", nb1);
+		return  nb0 - nb1;
 	}
 }
-
-
-
 
 void EtatJeux::afficherBits(const u64 val) const noexcept
 {
@@ -211,12 +227,12 @@ void EtatJeux::test() noexcept
 	afficherBits(joueurs[1]);
 	afficherBits(etatOccupation());
 
-	for (u8 i = 0; i < nColonnes * nLignes; ++i) {
+	bool fini = false;
+	for (u8 i = 0; !fini && i < nColonnes * nLignes; ++i) {
 		Coup c;
 		do {
 			c = static_cast<Coup>(rand()%7);
 		} while (!coupLicite(c));
-
 		printf("-------------------------------------------------------\n\n");
 		printf("Jouer %d joue en %zu\n\n", joueurCourant, c + 1);
 		jouer(c);
@@ -224,16 +240,12 @@ void EtatJeux::test() noexcept
 		afficherBits(joueurs[0]);
 		afficherBits(joueurs[1]);
 		afficherBits(etatOccupation());
+		printf("Estimation : %d\n", estimation());
+		fini = estGagnant(j0) || estGagnant(j1);
 	}
 
 	printf("\n");
 }
-
-i32 EtatJeux::estimation() const noexcept
-{
-	return 0;
-}
-
 
 Joueur_AlphaBeta_::Joueur_AlphaBeta_(std::string nom, bool joueur)
     :Joueur(nom,joueur)
