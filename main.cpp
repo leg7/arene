@@ -14,11 +14,22 @@ int main()
 
     // création de l'Arbitre (graine , joueur 1, joueur 2 , nombre de parties)
     // Arbitre a (9999, player::RAND, player::BRUTAL_,100);
-    Arbitre a (9999, player::RAND, player::A_,1);
-    a.challenge();
+    // Arbitre a (9999, player::RAND, player::A_,1);
+    // a.challenge();
 
-    // EtatJeux e;
-    // e.test();
+    EtatJeux e;
+    e.jouer(EtatJeux::Coup3);
+    e.afficher();
+    std::cout << "Estimation : " << e.estimation() << std::endl;
+    e.jouer(EtatJeux::Coup1);
+    e.afficher();
+    std::cout << "Estimation : " << e.estimation() << std::endl;
+    e.jouer(EtatJeux::Coup4);
+    e.afficher();
+    std::cout << "Estimation : " << e.estimation() << std::endl;
+    e.jouer(EtatJeux::Coup4);
+    e.afficher();
+    std::cout << "Estimation : " << e.estimation() << std::endl;
 
     // Jeu j(9999);
     //
