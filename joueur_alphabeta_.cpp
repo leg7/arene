@@ -207,14 +207,18 @@ void EtatJeux::afficher() const noexcept
 		for (u8 col = 0; col < 7; ++col) {
 			u64 mask = 0b0000001UL << (col + ligne * nColonnes);
 			if (joueurs[0] & mask) {
-				printf(" X ");
+				printf(" X |");
 			} else if (joueurs[1] & mask) {
-				printf(" O ");
+				printf(" O |");
 			} else {
-				printf("   ");
+				printf("   |");
 			}
 		}
-		printf("|\n");
+		printf("\n");
+	}
+	printf("|");
+	for (u8 ligne = 0; ligne < nColonnes; ++ligne) {
+		printf(" %d |", ligne);
 	}
 	printf("\n");
 }
