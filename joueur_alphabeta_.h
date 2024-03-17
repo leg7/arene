@@ -105,7 +105,7 @@ struct EtatJeux
 	void afficherCoupsPossibles() const noexcept;
 	void test() noexcept;
 
-	i32 estimation() const noexcept;
+	i32 estimation(const NumeroJoueur joueurAEstimer) const noexcept;
 	bool estGagnant(const NumeroJoueur j)const;
 
 	int nbPiecesConsecutives(const NumeroJoueur j)const;
@@ -115,6 +115,7 @@ class Joueur_AlphaBeta_ : public Joueur
 {
 private:
 	EtatJeux _etat_jeux;
+	EtatJeux::NumeroJoueur _joueurAEstimer;
 
 public:
   Joueur_AlphaBeta_(std::string nom, bool joueur);

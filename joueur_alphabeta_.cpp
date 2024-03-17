@@ -110,7 +110,7 @@ void EtatJeux::jouerDebug(const Coup coup) noexcept
 {
 	jouer(coup);
 	afficher();
-	std::cout << "Estimation : " << estimation() << std::endl;
+	std::cout << "Estimation : " << estimation(j0) << std::endl;
 }
 
 bool EtatJeux::estGagnant(const NumeroJoueur num)const{
@@ -178,25 +178,18 @@ int EtatJeux::nbPiecesConsecutives(NumeroJoueur num)const{
 	return nb_pieces_consecutives;
 }
 
-i32 EtatJeux::estimation() const noexcept{
-	// if (estGagnant(j1)) {
-	// 	return 10000;
-	// } else if (estGagnant(j0)) {
-	// 	return -10000;
-	// } else {
-		// int nb0 = nbPiecesConsecutives(j0);
-		// int nb1 = nbPiecesConsecutives(j1);
-		// // printf("Estimation joueur %d: %d\n", joueurCourant, nb0);
-		// // printf("Estimation joueur %d: %d\n", joueurCourant ^ 1, nb1);
-		// return 400 * __builtin_popcountl(joueurs[j1] & maskLigne[Coup4]) + (nb0 - nb1);
-		// return Coup1;
-	// }
-	if (estGagnant(j1)) {
+i32 EtatJeux::estimation(const NumeroJoueur joueurAEstimer) const noexcept
+{
+	const NumeroJoueur adversaire = static_cast<NumeroJoueur>(joueurAEstimer ^ 1);
+	if (estGagnant(joueurAEstimer)) {
 		return 10000;
-	} else if (estGagnant(j0)) {
+	} else if (estGagnant(adversaire)) {
 		return -10000;
+	} else {
+		int nb0 = nbPiecesConsecutives(joueurAEstimer);
+		int nb1 = nbPiecesConsecutives(adversaire);
+		return 3 * __builtin_popcountl(joueurs[joueurAEstimer] & maskColonne[Coup4]) + (nb0 - nb1);
 	}
-	return 1;
 }
 
 void EtatJeux::afficherBits(const u64 val) const noexcept
@@ -276,7 +269,7 @@ void EtatJeux::test() noexcept
 		afficherBits(joueurs[0]);
 		afficherBits(joueurs[1]);
 		afficherBits(etatOccupation());
-		printf("Estimation\t:\t%d\n", estimation());
+		printf("Estimation\t:\t%d\n", estimation(j0));
 		afficherCoupsPossibles();
 
 		fini = estGagnant(j0) || estGagnant(j1);
@@ -299,11 +292,13 @@ char Joueur_AlphaBeta_::nom_abbrege() const
 void Joueur_AlphaBeta_::recherche_coup(Jeu j, int &coup)
 {
 	// Joue le coup de l'adversaire pour actualiser notre plateau
-	std::cout << "coup adversaire : " << coup << std::endl;
+	// std::cout << "coup adversaire : " << coup << std::endl;
+	_joueurAEstimer = coup == -1000 ? EtatJeux::j0 : EtatJeux::j1;
 	_etat_jeux.jouer(static_cast<EtatJeux::Coup>(abs(coup) - 1));
-	// _etat_jeux.afficher();
 
-	u8 profondeur = 4;
+
+
+	u8 profondeur = 3;
 	i32 meilleur_score = INT32_MIN;
 	i32 score;
 	EtatJeux::Coup meilleur_coup;
@@ -330,8 +325,8 @@ void Joueur_AlphaBeta_::recherche_coup(Jeu j, int &coup)
 	}
 	// Joue notre coup pour actualiser notre plateau avant de rendre le mutex
 	_etat_jeux.jouer(meilleur_coup);
-	std::cout << "score : " << score << std::endl;
-	std::cout << "Notre coup : " << static_cast<int>(meilleur_coup) + 1 << std::endl;
+	// std::cout << "score : " << score << std::endl;
+	// std::cout << "Notre coup : " << static_cast<int>(meilleur_coup) + 1 << std::endl;
 	// _etat_jeux.afficher();
 	coup = static_cast<int>(meilleur_coup);
 }
@@ -344,11 +339,10 @@ i32 Joueur_AlphaBeta_::alpha_beta(const u8 profondeur, const EtatJeux &etat_jeux
 
 	//TODO : chronometre pour finir à 9,5 milisecondre
 
-
 	//TODO : faire l'estimateur pour l'etat du jeu
 	if (unsigned(profondeur) == 0) {
 		// return etat_jeux.estimation();
-		i32 val = etat_jeux.estimation();
+		i32 val = etat_jeux.estimation(_joueurAEstimer);
 		// std::cout << "profondeur break estimation : " << val << std::endl;
 		return val;
 	}
@@ -369,7 +363,7 @@ i32 Joueur_AlphaBeta_::alpha_beta(const u8 profondeur, const EtatJeux &etat_jeux
 	bool jeuxTermine = taille == 0;
 	if (jeuxTermine) {
 		// std::cout << "termine break" << std::endl;
-		return etat_jeux.estimation();
+		return etat_jeux.estimation(_joueurAEstimer);
 	}
 
 	// std::cout << "alpha_beta test fin." << std::endl;
