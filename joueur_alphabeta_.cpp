@@ -54,7 +54,7 @@ u8 EtatJeux::coupsPossibles(Coup coupsPossibles[nCoups]) const noexcept
 {
 	u8 len = 0;
 
-	u8 premiereLigne = ~(etatOccupation() & 0x7f);
+	// u8 premiereLigne = ~(etatOccupation() & 0x7f);
 
 	// if (premiereLigne == 127) {
 	// 	coupsPossibles = { Coup1, Coup2, Coup3, Coup4, Coup5, Coup6, Coup7 };
@@ -63,6 +63,7 @@ u8 EtatJeux::coupsPossibles(Coup coupsPossibles[nCoups]) const noexcept
 	// 	return 0;
 	// }
 
+	u64 premiereLigne = ~etatOccupation();
 	if ((premiereLigne & maskCoup[Coup1]) == maskCoup[Coup1]) coupsPossibles[len++] = Coup1;
 	if ((premiereLigne & maskCoup[Coup2]) == maskCoup[Coup2]) coupsPossibles[len++] = Coup2;
 	if ((premiereLigne & maskCoup[Coup3]) == maskCoup[Coup3]) coupsPossibles[len++] = Coup3;
@@ -112,7 +113,7 @@ void EtatJeux::jouerDebug(const Coup coup) noexcept
 	std::cout << "Estimation : " << estimation() << std::endl;
 }
 
-bool EtatJeux::estGagnant(NumeroJoueur num)const{
+bool EtatJeux::estGagnant(const NumeroJoueur num)const{
 	u64 etat = joueurs[num] << 22;
 
 	for (u64 i = 0; i < nCoups; i++) {
@@ -178,17 +179,24 @@ int EtatJeux::nbPiecesConsecutives(NumeroJoueur num)const{
 }
 
 i32 EtatJeux::estimation() const noexcept{
-	if (estGagnant(joueurCourant)) {
+	// if (estGagnant(j1)) {
+	// 	return 10000;
+	// } else if (estGagnant(j0)) {
+	// 	return -10000;
+	// } else {
+		// int nb0 = nbPiecesConsecutives(j0);
+		// int nb1 = nbPiecesConsecutives(j1);
+		// // printf("Estimation joueur %d: %d\n", joueurCourant, nb0);
+		// // printf("Estimation joueur %d: %d\n", joueurCourant ^ 1, nb1);
+		// return 400 * __builtin_popcountl(joueurs[j1] & maskLigne[Coup4]) + (nb0 - nb1);
+		// return Coup1;
+	// }
+	if (estGagnant(j1)) {
 		return 10000;
-	} else if (estGagnant(static_cast<NumeroJoueur>(joueurCourant ^ 1))) {
+	} else if (estGagnant(j0)) {
 		return -10000;
-	} else {
-		int nb0 = nbPiecesConsecutives(joueurCourant);
-		int nb1 = nbPiecesConsecutives(static_cast<NumeroJoueur>(joueurCourant ^ 1));
-		// printf("Estimation joueur %d: %d\n", joueurCourant, nb0);
-		// printf("Estimation joueur %d: %d\n", joueurCourant ^ 1, nb1);
-		return 4 * __builtin_popcountl(joueurs[joueurCourant] & maskLigne[Coup4]) + (nb0 - nb1);
 	}
+	return 1;
 }
 
 void EtatJeux::afficherBits(const u64 val) const noexcept
@@ -241,6 +249,20 @@ void EtatJeux::test() noexcept
 	bool fini = false;
 	for (u8 i = 0; !fini && i < nColonnes * nLignes; ++i) {
 		printf("-------------------------------------------------------\n\n");
+
+		Coup c;
+		do {
+			c = static_cast<Coup>(rand()%7);
+		} while (!coupLicite(c));
+		printf("Jouer %d joue en %zu\n\n", joueurCourant, c + 1);
+		jouer(c);
+
+		afficher();
+		afficherBits(joueurs[0]);
+		afficherBits(joueurs[1]);
+		afficherBits(etatOccupation());
+		printf("Estimation : %d\n", estimation());
+
 		Coup cp[nCoups];
 		int cpLen = coupsPossibles(cp);
 		printf("Coups Possibles: \n");
@@ -249,18 +271,8 @@ void EtatJeux::test() noexcept
 		}
 		printf("\n");
 
-		Coup c;
-		do {
-			c = static_cast<Coup>(rand()%7);
-		} while (!coupLicite(c));
-		printf("Jouer %d joue en %zu\n\n", joueurCourant, c + 1);
-		jouer(c);
-		afficher();
-		afficherBits(joueurs[0]);
-		afficherBits(joueurs[1]);
-		afficherBits(etatOccupation());
-		printf("Estimation : %d\n", estimation());
 		fini = estGagnant(j0) || estGagnant(j1);
+
 	}
 
 	printf("\n");
