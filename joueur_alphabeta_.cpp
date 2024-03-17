@@ -171,16 +171,16 @@ int EtatJeux::nbPiecesConsecutives(NumeroJoueur num)const{
 }
 
 i32 EtatJeux::estimation() const noexcept{
-	if (estGagnant(j0)) {
+	if (estGagnant(joueurCourant)) {
 		return 10000;
-	} else if (estGagnant(static_cast<NumeroJoueur>(j1))) {
+	} else if (estGagnant(static_cast<NumeroJoueur>(joueurCourant ^ 1))) {
 		return -10000;
 	} else {
 		int nb0 = nbPiecesConsecutives(joueurCourant);
-		int nb1 = nbPiecesConsecutives(static_cast<EtatJeux::NumeroJoueur>(joueurCourant ^ 1));
-		printf("Estimation j0: %d\n", nb0);
-		printf("Estimation j1: %d\n", nb1);
-		return  nb0 - nb1;
+		int nb1 = nbPiecesConsecutives(static_cast<NumeroJoueur>(joueurCourant ^ 1));
+		// printf("Estimation joueur %d: %d\n", joueurCourant, nb0);
+		// printf("Estimation joueur %d: %d\n", joueurCourant ^ 1, nb1);
+		return 4 * __builtin_popcountl(joueurs[joueurCourant] & maskLigne[Coup4]) + (nb0 - nb1);
 	}
 }
 
