@@ -102,6 +102,7 @@ struct EtatJeux
 
 	void afficher() const noexcept;
 	void afficherBits(const u64 joueur) const noexcept;
+	void afficherCoupsPossibles() const noexcept;
 	void test() noexcept;
 
 	i32 estimation() const noexcept;

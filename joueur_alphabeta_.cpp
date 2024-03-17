@@ -110,13 +110,6 @@ void EtatJeux::jouerDebug(const Coup coup) noexcept
 {
 	jouer(coup);
 	afficher();
-	Coup cp[nCoups];
-	int cpLen = coupsPossibles(cp);
-	printf("Coups Possibles: \n");
-	for (u8 i = 0; i < cpLen; ++i) {
-		printf("%zu ", cp[i]);
-	}
-	printf("\n");
 	std::cout << "Estimation : " << estimation() << std::endl;
 }
 
@@ -222,6 +215,17 @@ void EtatJeux::afficherBits(const u64 val) const noexcept
 	printf("\n");
 }
 
+void EtatJeux::afficherCoupsPossibles() const noexcept
+{
+		Coup cp[nCoups];
+		int cpLen = coupsPossibles(cp);
+		printf("Coups Possibles\t:\t");
+		for (u8 i = 0; i < cpLen; ++i) {
+			printf("%zu ", cp[i] + 1);
+		}
+		printf("\n");
+}
+
 void EtatJeux::afficher() const noexcept
 {
 	for (u8 ligne = 0; ligne < nLignes; ++ligne) {
@@ -245,7 +249,7 @@ void EtatJeux::afficher() const noexcept
 	for (u8 ligne = 0; ligne < nColonnes; ++ligne) {
 		printf(" %d |", ligne + 1);
 	}
-	printf("\nJoueur %s gagne\n", estGagnant(j0) ? "j0" : "j1");
+	printf("\n\nJoueur gagnant\t:\t%s\n", estGagnant(j0) ? "j0" : "j1");
 }
 
 void EtatJeux::test() noexcept
@@ -268,21 +272,14 @@ void EtatJeux::test() noexcept
 		jouer(c);
 
 		afficher();
+		printf("\n");
 		afficherBits(joueurs[0]);
 		afficherBits(joueurs[1]);
 		afficherBits(etatOccupation());
-		printf("Estimation : %d\n", estimation());
-
-		Coup cp[nCoups];
-		int cpLen = coupsPossibles(cp);
-		printf("Coups Possibles: \n");
-		for (u8 i = 0; i < cpLen; ++i) {
-			printf("%zu ", cp[i]);
-		}
-		printf("\n");
+		printf("Estimation\t:\t%d\n", estimation());
+		afficherCoupsPossibles();
 
 		fini = estGagnant(j0) || estGagnant(j1);
-
 	}
 
 	printf("\n");
