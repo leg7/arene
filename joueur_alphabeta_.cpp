@@ -50,46 +50,49 @@ bool EtatJeux::coupLicite(const Coup coup) const noexcept
 
 // a ameliorer, voire faire directement dans le alpha beta pour pas passer par un vecteur inutile
 // Pas ouf la table de lookup remplacer par constantes
-u8 EtatJeux::coupsPossiblesIf(Coup coupsPossibles[nCoups]) const noexcept
+u8 EtatJeux::coupsPossibles(Coup coupsPossibles[nCoups]) const noexcept
 {
 	u8 len = 0;
 
-	static Coup toutPossible[nCoups] = { Coup1, Coup2, Coup3, Coup4, Coup5, Coup6, Coup7 };
-
 	u8 premiereLigne = (etatOccupation() & 0x7f);
-	if (premiereLigne == 0) {
-		coupsPossibles = toutPossible;
-		return nCoups;
-	} else if (premiereLigne == 127) {
-		return 0;
-	}
+	// if (premiereLigne == 0) {
+	// 	for (u8 i = 0; i < nCoups; ++i) {
+	// 		coupsPossibles[i] = static_cast<Coup>(i);
+	// 	}
+	// 	return nCoups;
+	// } else if (premiereLigne == 127) {
+	// 	return 0;
+	// }
 
 	premiereLigne = ~premiereLigne;
-	if (premiereLigne & maskCoup[Coup1]) coupsPossibles[len++] = Coup1;
-	if (premiereLigne & maskCoup[Coup2]) coupsPossibles[len++] = Coup2;
-	if (premiereLigne & maskCoup[Coup3]) coupsPossibles[len++] = Coup3;
-	if (premiereLigne & maskCoup[Coup4]) coupsPossibles[len++] = Coup4;
-	if (premiereLigne & maskCoup[Coup5]) coupsPossibles[len++] = Coup5;
-	if (premiereLigne & maskCoup[Coup6]) coupsPossibles[len++] = Coup6;
-	if (premiereLigne & maskCoup[Coup7]) coupsPossibles[len++] = Coup7;
+	afficherBits(premiereLigne);
+	if ((premiereLigne & maskCoup[Coup1]) == maskCoup[Coup1]) coupsPossibles[len++] = Coup1;
+	if ((premiereLigne & maskCoup[Coup2]) == maskCoup[Coup2]) coupsPossibles[len++] = Coup2;
+	if ((premiereLigne & maskCoup[Coup3]) == maskCoup[Coup3]) coupsPossibles[len++] = Coup3;
+	if ((premiereLigne & maskCoup[Coup4]) == maskCoup[Coup4]) coupsPossibles[len++] = Coup4;
+	if ((premiereLigne & maskCoup[Coup5]) == maskCoup[Coup5]) coupsPossibles[len++] = Coup5;
+	if ((premiereLigne & maskCoup[Coup6]) == maskCoup[Coup6]) coupsPossibles[len++] = Coup6;
+	if ((premiereLigne & maskCoup[Coup7]) == maskCoup[Coup7]) coupsPossibles[len++] = Coup7;
 
 	return len;
 }
 
 // Devrait etre meilleurs sur les anciens cpus avec un moins bon predicteur de branche
-u8 EtatJeux::coupsPossibles(Coup coupsPossibles[nCoups]) const noexcept
-{
-	u8 len = 0;
-	u8 premiereLigne = ~(etatOccupation() & 0x7f);
-
-	while (premiereLigne != 0) {
-		const Coup coup = static_cast<Coup>(__builtin_ctz(premiereLigne));
-		coupsPossibles[len++] = coup;
-		premiereLigne &= ~(1UL << coup);
-	}
-
-	return len;
-}
+// u8 EtatJeux::coupsPossibles(Coup coupsPossibles[nCoups]) const noexcept
+// {
+// 	u8 len = 0;
+// 	u8 premiereLigne = ~(etatOccupation() & 0x7f);
+// 	afficherBits(premiereLigne);
+//
+// 	while (premiereLigne != 0) {
+// 		const Coup coup = static_cast<Coup>(__builtin_ctz(premiereLigne));
+// 		printf("tz: %zu", coup);
+// 		coupsPossibles[len++] = coup;
+// 		premiereLigne &= ~maskCoup[coup];
+// 	}
+//
+// 	return len;
+// }
 
 void EtatJeux::jouer(const Coup coup) noexcept
 {
@@ -233,11 +236,25 @@ void EtatJeux::test() noexcept
 
 	bool fini = false;
 	for (u8 i = 0; !fini && i < nColonnes * nLignes; ++i) {
+		printf("-------------------------------------------------------\n\nCoupsPossibles:   ");
+		Coup cp[nCoups];
+		int cpLen = coupsPossibles(cp);
+		for (u8 i = 0; i < cpLen; ++i) {
+			printf("%zu ", cp[i]);
+		}
+		printf("\n");
+		// printf("\nCoupsPossiblesIf:");
+		// cpLen = coupsPossiblesIf(cp);
+		// for (u8 i = 0; i < cpLen; ++i) {
+		// 	printf("%zu ", cp[i]);
+		// }
+		// printf("\n");
+
+
 		Coup c;
 		do {
 			c = static_cast<Coup>(rand()%7);
 		} while (!coupLicite(c));
-		printf("-------------------------------------------------------\n\n");
 		printf("Jouer %d joue en %zu\n\n", joueurCourant, c + 1);
 		jouer(c);
 		afficher();
