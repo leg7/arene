@@ -31,6 +31,20 @@ int main()
     // e.jouerDebug(EtatJeux::Coup4);
     // e.jouerDebug(EtatJeux::Coup1);
     // e.jouerDebug(EtatJeux::Coup5);
+    //
+    // e.jouerDebug(EtatJeux::Coup7);
+    // e.jouerDebug(EtatJeux::Coup7);
+    // e.jouerDebug(EtatJeux::Coup7);
+    // e.jouerDebug(EtatJeux::Coup7);
+    // e.jouerDebug(EtatJeux::Coup7);
+    // e.jouerDebug(EtatJeux::Coup7);
+    //
+    // e.jouerDebug(EtatJeux::Coup1);
+    // e.jouerDebug(EtatJeux::Coup1);
+    // e.jouerDebug(EtatJeux::Coup1);
+    // e.jouerDebug(EtatJeux::Coup1);
+    // e.jouerDebug(EtatJeux::Coup1);
+    // e.jouerDebug(EtatJeux::Coup1);
 
     // Jeu j(9999);
     //

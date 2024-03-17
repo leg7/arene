@@ -110,6 +110,13 @@ void EtatJeux::jouerDebug(const Coup coup) noexcept
 {
 	jouer(coup);
 	afficher();
+	Coup cp[nCoups];
+	int cpLen = coupsPossibles(cp);
+	printf("Coups Possibles: \n");
+	for (u8 i = 0; i < cpLen; ++i) {
+		printf("%zu ", cp[i]);
+	}
+	printf("\n");
 	std::cout << "Estimation : " << estimation() << std::endl;
 }
 
@@ -221,21 +228,24 @@ void EtatJeux::afficher() const noexcept
 		printf("|");
 		for (u8 col = 0; col < 7; ++col) {
 			u64 mask = 0b0000001UL << (col + ligne * nColonnes);
-			if (joueurs[0] & mask) {
-				printf(" X |");
-			} else if (joueurs[1] & mask) {
-				printf(" O |");
+			if (joueurs[j0] & mask) {
+				printf(" 0 |");
+			} else if (joueurs[j1] & mask) {
+				printf(" 1 |");
 			} else {
 				printf("   |");
 			}
 		}
 		printf("\n");
 	}
-	printf("|");
-	for (u8 ligne = 0; ligne < nColonnes; ++ligne) {
-		printf(" %d |", ligne);
+	for (u8 i = 0; i < nColonnes; ++i) {
+		printf("----");
 	}
-	printf("\n");
+	printf("-\n|");
+	for (u8 ligne = 0; ligne < nColonnes; ++ligne) {
+		printf(" %d |", ligne + 1);
+	}
+	printf("\nJoueur %s gagne\n", estGagnant(j0) ? "j0" : "j1");
 }
 
 void EtatJeux::test() noexcept
