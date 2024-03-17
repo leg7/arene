@@ -54,18 +54,15 @@ u8 EtatJeux::coupsPossibles(Coup coupsPossibles[nCoups]) const noexcept
 {
 	u8 len = 0;
 
-	u8 premiereLigne = (etatOccupation() & 0x7f);
-	// if (premiereLigne == 0) {
-	// 	for (u8 i = 0; i < nCoups; ++i) {
-	// 		coupsPossibles[i] = static_cast<Coup>(i);
-	// 	}
+	u8 premiereLigne = ~(etatOccupation() & 0x7f);
+
+	// if (premiereLigne == 127) {
+	// 	coupsPossibles = { Coup1, Coup2, Coup3, Coup4, Coup5, Coup6, Coup7 };
 	// 	return nCoups;
-	// } else if (premiereLigne == 127) {
+	// } else if (premiereLigne == 0) {
 	// 	return 0;
 	// }
 
-	premiereLigne = ~premiereLigne;
-	afficherBits(premiereLigne);
 	if ((premiereLigne & maskCoup[Coup1]) == maskCoup[Coup1]) coupsPossibles[len++] = Coup1;
 	if ((premiereLigne & maskCoup[Coup2]) == maskCoup[Coup2]) coupsPossibles[len++] = Coup2;
 	if ((premiereLigne & maskCoup[Coup3]) == maskCoup[Coup3]) coupsPossibles[len++] = Coup3;
