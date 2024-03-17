@@ -236,20 +236,14 @@ void EtatJeux::test() noexcept
 
 	bool fini = false;
 	for (u8 i = 0; !fini && i < nColonnes * nLignes; ++i) {
-		printf("-------------------------------------------------------\n\nCoupsPossibles:   ");
+		printf("-------------------------------------------------------\n\n");
 		Coup cp[nCoups];
 		int cpLen = coupsPossibles(cp);
+		printf("Coups Possibles: \n");
 		for (u8 i = 0; i < cpLen; ++i) {
 			printf("%zu ", cp[i]);
 		}
 		printf("\n");
-		// printf("\nCoupsPossiblesIf:");
-		// cpLen = coupsPossiblesIf(cp);
-		// for (u8 i = 0; i < cpLen; ++i) {
-		// 	printf("%zu ", cp[i]);
-		// }
-		// printf("\n");
-
 
 		Coup c;
 		do {
