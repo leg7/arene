@@ -261,7 +261,10 @@ char Joueur_AlphaBeta_::nom_abbrege() const
 void Joueur_AlphaBeta_::recherche_coup(Jeu j, int &coup)
 {
 	// Joue le coup de l'adversaire pour actualiser notre plateau
-	_etat_jeux.jouer(static_cast<EtatJeux::Coup>(coup));
+	std::cout << "coup adversaire : " << coup << std::endl;
+	std::cout << "coup adversaire abs: " << coup << std::endl;
+	_etat_jeux.jouer(static_cast<EtatJeux::Coup>(abs(coup) - 1));
+	_etat_jeux.afficher();
 
 	u8 profondeur = 4;
 	i32 meilleur_score = INT32_MIN;
@@ -270,10 +273,19 @@ void Joueur_AlphaBeta_::recherche_coup(Jeu j, int &coup)
 	EtatJeux::Coup listCoupsPossibles[EtatJeux::nCoups];
 	u8 taille = _etat_jeux.coupsPossibles(listCoupsPossibles);
 
+	std::cout << "recherche::profondeur : " << unsigned(profondeur) << std::endl;
+	std::cout <<"recherche::taille : " <<  unsigned(taille) << std::endl;
+	std::cout << "recherce::listCoupsPossibles : " << std::endl;
+	for (u8 i = 0; i < taille; ++i) {
+		std::cout << listCoupsPossibles[i] << " ";
+	}
+	std::cout << std::endl;
+
 	for (u8 i = 0; i < taille; ++i) {
 		EtatJeux tmp(_etat_jeux);
 		tmp.jouer(listCoupsPossibles[i]);
 		score = alpha_beta(profondeur, tmp, INT32_MIN, INT32_MAX, true);
+		std::cout << "recherce::score : " << score << std::endl;
 		if (meilleur_score < score) {
 			meilleur_score = score;
 			meilleur_coup = listCoupsPossibles[i];
@@ -281,38 +293,73 @@ void Joueur_AlphaBeta_::recherche_coup(Jeu j, int &coup)
 	}
 	// Joue notre coup pour actualiser notre plateau avant de rendre le mutex
 	_etat_jeux.jouer(meilleur_coup);
+	std::cout << "Notre coup : " << meilleur_coup << std::endl;
+	_etat_jeux.afficher();
 	coup = static_cast<int>(meilleur_coup);
 }
 
 i32 Joueur_AlphaBeta_::alpha_beta(const u8 profondeur, const EtatJeux &etat_jeux, i32 alpha, i32 beta, const bool isMax) {
+	std::cout << "alpha_beta : " << std::endl;
+	std::cout << " 		profondeur : " << unsigned(profondeur) << std::endl;
+	std::cout << " 		Player : " << (isMax? "Max" : "Min") << std::endl;
+	etat_jeux.afficher();
+
 	//TODO : chronometre pour finir à 9,5 milisecondre
 
 
 	//TODO : faire l'estimateur pour l'etat du jeu
-	if (profondeur <= 0) return etat_jeux.estimation();
+	if (unsigned(profondeur) == 0) {
+		// return etat_jeux.estimation();
+		i32 val = etat_jeux.estimation();
+		std::cout << "profondeur break estimation : " << val << std::endl;
+		return val;
+	}
 
  	i32 score;
 
 	EtatJeux::Coup listCoupsPossibles[EtatJeux::nColonnes];
 	u8 taille = etat_jeux.coupsPossibles(listCoupsPossibles);
+	std::cout <<"taille : " <<  unsigned(taille) << std::endl;
+	std::cout << "ab::listCoupsPossibles : " << std::endl;
+	for (u8 i = 0; i < taille; ++i) {
+		std::cout << listCoupsPossibles[i] << " ";
+	}
+	std::cout << std::endl;
+
 
 	// TODO : faire la fonction de test si le jeu est fini.
 	bool jeuxTermine = taille == 0;
 	if (jeuxTermine) {
+		std::cout << "termine break" << std::endl;
 		return etat_jeux.estimation();
 	}
 
+	std::cout << "alpha_beta test fin." << std::endl;
+
 
 	if (isMax) {
+		std::cout << "ab::max" << std::endl;
 		score = INT32_MIN;
 
 		for (u8 i = 0; i < taille; ++i) {
+			std::cout << "ab::max::coup : " << unsigned(i) <<  std::endl;
 			EtatJeux tmp(etat_jeux);
 			tmp.jouer(listCoupsPossibles[i]);
-			score = std::max(score, alpha_beta(profondeur-1, tmp, alpha, beta, false));
+			std::cout << "tmp etat" << std::endl;
+			tmp.afficher();
+			std::cout << "--------" << std::endl;
+			std::cout << "===============ab::max avant rec=============" <<  std::endl;
+			// score = std::max(score, alpha_beta(profondeur=1, tmp, alpha, beta, false));
+			i32 val = alpha_beta(profondeur-1, tmp, alpha, beta, false);
+			score = std::max(score,val);
+			std::cout << "===============ab::max apres rec=============" <<  std::endl;
+			std::cout << "ab::max::score : " << score <<  std::endl;
+			std::cout << "ab::max::val : " << val <<  std::endl;
+			std::cout << "ab::max::score : " << score <<  std::endl;
 
 			// Beta coupure
 			if (score >= beta) {
+				std::cout << "Beta coupure" << std::endl;
 				break;
 			}
 
@@ -320,16 +367,28 @@ i32 Joueur_AlphaBeta_::alpha_beta(const u8 profondeur, const EtatJeux &etat_jeux
 				alpha = score;
 			}
 		}
+		std::cout << "ab::max::fin" << std::endl;
 	} else {
+		std::cout << "ab::min" << std::endl;
 		score = INT32_MAX;
 
 		for (u8 i = 0; i < taille; ++i) {
+			std::cout << "ab::min::coup : " << unsigned(i) <<  std::endl;
 			EtatJeux tmp(etat_jeux);
 			tmp.jouer(listCoupsPossibles[i]);
-			score = std::min(score, alpha_beta(profondeur-1, etat_jeux, alpha, beta, true));
+			std::cout << "tmp etat" << std::endl;
+			tmp.afficher();
+			std::cout << "--------" << std::endl;
+			// score = std::min(score, alpha_beta(profondeur-1, tmp, alpha, beta, true));
+			i32 val = alpha_beta(profondeur-1, tmp, alpha, beta, true);
+			score = std::min(score,val);
+			std::cout << "ab::min::score : " << score <<  std::endl;
+			std::cout << "ab::min::val : " << val <<  std::endl;
+			std::cout << "ab::min::score : " << score <<  std::endl;
 
 			// Alpha coupure
 			if (score <= alpha) {
+				std::cout << "Alpha coupure" << std::endl;
 				break;
 			}
 
@@ -337,7 +396,10 @@ i32 Joueur_AlphaBeta_::alpha_beta(const u8 profondeur, const EtatJeux &etat_jeux
 				beta = score;
 			}
 		}
+		std::cout << "ab::min::fin" << std::endl;
 	}
 
+	std::cout << "alpha_beta fin." << std::endl;
+	std::cout << "ab::score : " << score << std::endl;
 	return score;
 }

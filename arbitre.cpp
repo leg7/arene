@@ -4,7 +4,7 @@
 Arbitre::Arbitre(int graine, player player1, player player2, int nombre_parties)
   :
    _jeu(graine),
-   _coups(nombre_parties, -1),
+   _coups(nombre_parties, -1000),
    _coups_mutex(nombre_parties),
    _nombre_parties(nombre_parties),
    _numero_partie(1),
@@ -90,7 +90,7 @@ int Arbitre::partie()
       bool try_lock = false;
       tour++;
 
-      _coups[_numero_partie-1] = -1;
+      //  _coups[_numero_partie-1] = -1;
       _coups_mutex[_numero_partie-1].unlock();
       
       std::thread thread_joueur(&Joueur::jouer,
@@ -106,7 +106,7 @@ int Arbitre::partie()
 	std::cerr <<  std::endl << "mutex non rendu " << std::endl;
 	try_lock = true;
       }
-      else if(_coups[_numero_partie-1] == -1) {
+      else if(_coups[_numero_partie-1] == -1000) {
 	std::cerr << "coup invalide -1" << std::endl;
       }
       else if(!_jeu.coup_licite(_coups[_numero_partie-1])) {
@@ -116,7 +116,7 @@ int Arbitre::partie()
 thread_joueur.detach();
  
       if(try_lock ||
-	 (_coups[_numero_partie-1] == -1) ||
+	 (_coups[_numero_partie-1] == -1000) ||
 	 !_jeu.coup_licite(_coups[_numero_partie-1]))   
 	{
 	  if(_jeu.partie_nulle())
