@@ -392,7 +392,7 @@ i32 Joueur_AlphaBeta_::alpha_beta(const u8 profondeur, const EtatJeux &etat_jeux
 			// Beta coupure
 			if (score >= beta) {
 				// std::cout << "Beta coupure" << std::endl;
-				break;
+				return score;
 			}
 
 			if (score > alpha) {
@@ -421,7 +421,7 @@ i32 Joueur_AlphaBeta_::alpha_beta(const u8 profondeur, const EtatJeux &etat_jeux
 			// Alpha coupure
 			if (score <= alpha) {
 				// std::cout << "Alpha coupure" << std::endl;
-				break;
+				return score;
 			}
 
 			if (score < beta) {
