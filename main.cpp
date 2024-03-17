@@ -18,18 +18,17 @@ int main()
     // a.challenge();
 
     EtatJeux e;
-    e.jouer(EtatJeux::Coup3);
-    e.afficher();
-    std::cout << "Estimation : " << e.estimation() << std::endl;
-    e.jouer(EtatJeux::Coup1);
-    e.afficher();
-    std::cout << "Estimation : " << e.estimation() << std::endl;
-    e.jouer(EtatJeux::Coup4);
-    e.afficher();
-    std::cout << "Estimation : " << e.estimation() << std::endl;
-    e.jouer(EtatJeux::Coup4);
-    e.afficher();
-    std::cout << "Estimation : " << e.estimation() << std::endl;
+    e.jouerDebug(EtatJeux::Coup2);
+    e.jouerDebug(EtatJeux::Coup1);
+    e.jouerDebug(EtatJeux::Coup3);
+    e.jouerDebug(EtatJeux::Coup1);
+    e.jouerDebug(EtatJeux::Coup4);
+    e.jouerDebug(EtatJeux::Coup1);
+    e.jouerDebug(EtatJeux::Coup1);
+    e.jouerDebug(EtatJeux::Coup4);
+    e.jouerDebug(EtatJeux::Coup4);
+    e.jouerDebug(EtatJeux::Coup1);
+    e.jouerDebug(EtatJeux::Coup5);
 
     // Jeu j(9999);
     //

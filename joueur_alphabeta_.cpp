@@ -105,6 +105,13 @@ void EtatJeux::jouer(const Coup coup) noexcept
 	joueurCourant = static_cast<NumeroJoueur>(joueurCourant ^ 1);
 }
 
+void EtatJeux::jouerDebug(const Coup coup) noexcept
+{
+	jouer(coup);
+	afficher();
+	std::cout << "Estimation : " << estimation() << std::endl;
+}
+
 bool EtatJeux::estGagnant(NumeroJoueur num)const{
 	u64 etat = joueurs[num] << 22;
 

@@ -98,6 +98,7 @@ struct EtatJeux
 
 	// Suppose que le coup est licite
 	void jouer(const Coup coup) noexcept;
+	void jouerDebug(const Coup coup) noexcept;
 
 	void afficher() const noexcept;
 	void afficherBits(const u64 joueur) const noexcept;
