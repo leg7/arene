@@ -346,7 +346,6 @@ void Joueur_AlphaBeta_::recherche_coup(Jeu j, int &coup)
 	EtatJeux::Coup meilleur_coup;
 	EtatJeux::Coup listCoupsPossibles[EtatJeux::nCoups];
 	u8 taille = _etat_jeux.coupsPossibles(listCoupsPossibles);
-	taille = taille / 2;
 
 	// std::cout << "recherche::profondeur : " << unsigned(profondeur) << std::endl;
 	// std::cout <<"recherche::taille : " <<  unsigned(taille) << std::endl;
