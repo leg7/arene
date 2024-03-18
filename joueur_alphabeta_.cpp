@@ -329,15 +329,15 @@ void Joueur_AlphaBeta_::recherche_coup(Jeu j, int &coup)
 {
 	// Joue le coup de l'adversaire pour actualiser notre plateau
 
-	std::cout << "coup adversaire (struct Prof): " << coup << std::endl;
-	std::cout << "coup adversaire (struct bitset): " << abs(coup) - 1 << std::endl;
+	// std::cout << "coup adversaire (struct Prof): " << coup << std::endl;
+	// std::cout << "coup adversaire (struct bitset): " << abs(coup) - 1 << std::endl;
 	_joueurAEstimer = coup == -1000 ? EtatJeux::j0 : EtatJeux::j1;
 
 	if (coup == -1000) {
 		_etat_jeux.jouer(static_cast<EtatJeux::Coup>(3));
-		std::cout << "joueurs[1] " << _etat_jeux.joueurs[1] << std::endl;
-		std::cout << "joueurs[0] " << _etat_jeux.joueurs[0] << std::endl;
-		_etat_jeux.afficher();
+		// std::cout << "joueurs[1] " << _etat_jeux.joueurs[1] << std::endl;
+		// std::cout << "joueurs[0] " << _etat_jeux.joueurs[0] << std::endl;
+		// _etat_jeux.afficher();
 
 		coup = 3;
 		return;
@@ -345,9 +345,9 @@ void Joueur_AlphaBeta_::recherche_coup(Jeu j, int &coup)
 
 	_etat_jeux.jouer(static_cast<EtatJeux::Coup>((abs(coup) - 1)));
 
-	std::cout << "joueurs[0] " << _etat_jeux.joueurs[0] << std::endl;
-	std::cout << "joueurs[1] " << _etat_jeux.joueurs[1] << std::endl;
-	_etat_jeux.afficher();
+	// std::cout << "joueurs[0] " << _etat_jeux.joueurs[0] << std::endl;
+	// std::cout << "joueurs[1] " << _etat_jeux.joueurs[1] << std::endl;
+	// _etat_jeux.afficher();
 
 
 	u8 profondeur = 4;
@@ -378,9 +378,9 @@ void Joueur_AlphaBeta_::recherche_coup(Jeu j, int &coup)
 	// Joue notre coup pour actualiser notre plateau avant de rendre le mutex
 	_etat_jeux.jouer(meilleur_coup);
 	// std::cout << "score : " << score << std::endl;
-	std::cout << "Notre coup (Struct prof): " << static_cast<int>(meilleur_coup)+1 << std::endl;
-	std::cout << "Notre coup (Struct bitset): " << static_cast<int>(meilleur_coup) << std::endl;
-	_etat_jeux.afficher();
+	// std::cout << "Notre coup (Struct prof): " << static_cast<int>(meilleur_coup)+1 << std::endl;
+	// std::cout << "Notre coup (Struct bitset): " << static_cast<int>(meilleur_coup) << std::endl;
+	// _etat_jeux.afficher();
 	coup = static_cast<int>(meilleur_coup);
 }
 
