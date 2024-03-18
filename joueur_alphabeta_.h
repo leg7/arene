@@ -117,6 +117,7 @@ class Joueur_AlphaBeta_ : public Joueur
 private:
 	EtatJeux _etat_jeux;
 	EtatJeux::NumeroJoueur _joueurAEstimer;
+	bool _firstTimeAround = true;
 
 public:
   Joueur_AlphaBeta_(std::string nom, bool joueur);
