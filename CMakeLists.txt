@@ -8,7 +8,7 @@ set(CMAKE_BUILD_TYPE Debug)
 set(CMAKE_CXX_STANDARD 17)
 set(CMAKE_CXX_STANDARD_REQUIRED on)
 set(CMAKE_CXX_EXTENSIONS off)
-add_compile_options(-Wall -Wpedantic -ggdb)
+add_compile_options(-O3 -flto -Wall -Wpedantic -ggdb)
 
 
 
