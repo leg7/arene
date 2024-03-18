@@ -43,8 +43,8 @@ struct EtatJeux
 	/* Fonctionne comme un mask pour extraire la valeure de la premiere ligne
 	 * a la colonne n pour verifier si le coup est licite
 	 */
-	static constexpr const u64 nCoups = 7;
-	static constexpr const u64 maskCoup[nCoups] = {
+	static constexpr const u8 nCoups = 7;
+	static constexpr const u8 maskCoup[nCoups] = {
 		1,
 		1 << 1,
 		1 << 2,

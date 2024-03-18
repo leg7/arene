@@ -63,7 +63,7 @@ u8 EtatJeux::coupsPossibles(Coup coupsPossibles[nCoups]) const noexcept
 	// 	return 0;
 	// }
 
-	u64 premiereLigne = ~etatOccupation();
+	u8 premiereLigne = ~etatOccupation();
 	if ((premiereLigne & maskCoup[Coup1]) == maskCoup[Coup1]) coupsPossibles[len++] = Coup1;
 	if ((premiereLigne & maskCoup[Coup2]) == maskCoup[Coup2]) coupsPossibles[len++] = Coup2;
 	if ((premiereLigne & maskCoup[Coup3]) == maskCoup[Coup3]) coupsPossibles[len++] = Coup3;
