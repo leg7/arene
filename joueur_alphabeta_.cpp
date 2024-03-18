@@ -199,9 +199,9 @@ bool EtatJeux::fourchettePour(const NumeroJoueur joueurAEstimer) const noexcept
 		const u8 mask3    = 0b0'0001110;
 		const u8 maskAdv3 = 0b0'0010001;
 
-		if ((etat & mask1) == mask1 && (etatAdv & maskAdv1) == 0 ||
-		    (etat & mask2) == mask2 && (etatAdv & maskAdv2) == 0 ||
-		    (etat & mask3) == mask3 && (etatAdv & maskAdv3) == 0) {
+		if (((etat & mask1) == mask1 && (etatAdv & maskAdv1) == 0) ||
+		    ((etat & mask2) == mask2 && (etatAdv & maskAdv2) == 0) ||
+		    ((etat & mask3) == mask3 && (etatAdv & maskAdv3) == 0)) {
 			return true;
 		}
 	}
@@ -212,10 +212,14 @@ bool EtatJeux::fourchettePour(const NumeroJoueur joueurAEstimer) const noexcept
 i32 EtatJeux::estimation(const NumeroJoueur joueurAEstimer) const noexcept
 {
 	const NumeroJoueur adversaire = static_cast<NumeroJoueur>(joueurAEstimer ^ 1);
-	if (fourchettePour(joueurAEstimer) || estGagnant(joueurAEstimer)) {
+	if (estGagnant(joueurAEstimer)) {
 		return INT32_MAX;
-	} else if (fourchettePour(adversaire) || estGagnant(adversaire)) {
+	} else if (estGagnant(adversaire)) {
 		return INT32_MIN;
+	} else if (fourchettePour(joueurAEstimer)) {
+		return 10000000;
+	} else if (fourchettePour(adversaire)) {
+		return -10000000;
 	} else {
 		int nb0 = nbPiecesConsecutives(joueurAEstimer);
 		int nb1 = nbPiecesConsecutives(adversaire);
