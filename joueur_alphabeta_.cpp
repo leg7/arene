@@ -182,9 +182,9 @@ i32 EtatJeux::estimation(const NumeroJoueur joueurAEstimer) const noexcept
 {
 	const NumeroJoueur adversaire = static_cast<NumeroJoueur>(joueurAEstimer ^ 1);
 	if (estGagnant(joueurAEstimer)) {
-		return 10000;
+		return INT32_MAX;
 	} else if (estGagnant(adversaire)) {
-		return -10000;
+		return INT32_MIN;
 	} else {
 		int nb0 = nbPiecesConsecutives(joueurAEstimer);
 		int nb1 = nbPiecesConsecutives(adversaire);
