@@ -271,9 +271,10 @@ void EtatJeux::afficher() const noexcept
 	}
 	printf("-\n|");
 	for (u8 ligne = 0; ligne < nColonnes; ++ligne) {
-		printf(" %d |", ligne + 1);
+		printf(" %d |", ligne);
 	}
-	printf("\n\nJoueur gagnant\t:\t%s\n", estGagnant(j0) ? "j0" : "j1");
+	printf("\n");
+	// printf("\n\nJoueur gagnant\t:\t%s\n", estGagnant(j0) ? "j0" : "j1");
 }
 
 void EtatJeux::test() noexcept
@@ -323,17 +324,29 @@ char Joueur_AlphaBeta_::nom_abbrege() const
 void Joueur_AlphaBeta_::recherche_coup(Jeu j, int &coup)
 {
 	// Joue le coup de l'adversaire pour actualiser notre plateau
-	std::cout << "coup adversaire : " << coup << std::endl;
+
+	std::cout << "coup adversaire (struct Prof): " << coup << std::endl;
+	std::cout << "coup adversaire (struct bitset): " << abs(coup) - 1 << std::endl;
 	_joueurAEstimer = coup == -1000 ? EtatJeux::j0 : EtatJeux::j1;
-	_etat_jeux.jouer(static_cast<EtatJeux::Coup>(abs(coup) - 1));
+
+	if (coup != -1000) {
+		_etat_jeux.jouer(static_cast<EtatJeux::Coup>((abs(coup) - 1)));
+		coup = 3;
+		return;
+	}
+
+	std::cout << "joueurs[0] " << _etat_jeux.joueurs[0] << std::endl;
+	std::cout << "joueurs[1] " << _etat_jeux.joueurs[1] << std::endl;
 	_etat_jeux.afficher();
 
-	u8 profondeur = 3;
+
+	u8 profondeur = 4;
 	i32 meilleur_score = INT32_MIN;
 	i32 score;
 	EtatJeux::Coup meilleur_coup;
 	EtatJeux::Coup listCoupsPossibles[EtatJeux::nCoups];
 	u8 taille = _etat_jeux.coupsPossibles(listCoupsPossibles);
+	taille = taille / 2;
 
 	// std::cout << "recherche::profondeur : " << unsigned(profondeur) << std::endl;
 	// std::cout <<"recherche::taille : " <<  unsigned(taille) << std::endl;
@@ -343,7 +356,8 @@ void Joueur_AlphaBeta_::recherche_coup(Jeu j, int &coup)
 	// }
 	// std::cout << std::endl;
 
-	for (u8 i = 0; i < taille; ++i) {
+	// for (u8 i = 0; i < taille; ++i) {
+	for (u8 i = 0; i < taille )
 		EtatJeux tmp(_etat_jeux);
 		tmp.jouer(listCoupsPossibles[i]);
 		score = alpha_beta(profondeur, tmp, INT32_MIN, INT32_MAX, true);
@@ -355,10 +369,10 @@ void Joueur_AlphaBeta_::recherche_coup(Jeu j, int &coup)
 	}
 	// Joue notre coup pour actualiser notre plateau avant de rendre le mutex
 	_etat_jeux.jouer(meilleur_coup);
-	_etat_jeux.afficher();
 	// std::cout << "score : " << score << std::endl;
-	std::cout << "Notre coup : " << static_cast<int>(meilleur_coup) + 1 << std::endl;
-	// _etat_jeux.afficher();
+	std::cout << "Notre coup (Struct prof): " << static_cast<int>(meilleur_coup)+1 << std::endl;
+	std::cout << "Notre coup (Struct bitset): " << static_cast<int>(meilleur_coup) << std::endl;
+	_etat_jeux.afficher();
 	coup = static_cast<int>(meilleur_coup);
 }
 

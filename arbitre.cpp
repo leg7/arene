@@ -1,5 +1,7 @@
 #include "arbitre.h"
 
+std::vector<int> coup_invalide;
+std::vector<int> mutex_non_rendu;
 
 Arbitre::Arbitre(int graine, player player1, player player2, int nombre_parties)
   :
@@ -16,9 +18,9 @@ void Arbitre::initialisation()
 {
   _joueur1=nullptr;
   _joueur2=nullptr;
-  
+
   _jeu.reset();
-  
+
   switch ((_numero_partie%2? _player1 : _player2)) {
   case player::A_:
     _joueur1 = std::make_shared<Joueur_AlphaBeta_> ("AlphaBeta",true);
@@ -32,7 +34,7 @@ void Arbitre::initialisation()
   default:
     break;
   }
-  
+
   switch ((!(_numero_partie%2)? _player1 : _player2)) {
   case player::A_:
     _joueur2 = std::make_shared<Joueur_AlphaBeta_> ("AlphaBeta",false);
@@ -46,7 +48,7 @@ void Arbitre::initialisation()
   default:
     break;
   }
-  
+
 }
 
 void Arbitre::challenge()
@@ -61,7 +63,7 @@ void Arbitre::challenge()
     {
         std::cout << "\n" << "Partie n°" << _numero_partie << " : ";
 	int resultat = partie();
-	if (resultat != 0) 
+	if (resultat != 0)
 	  (resultat== 1 ?
 	   ((_numero_partie%2)?
 	    victoire_joueur_1++
@@ -79,6 +81,16 @@ void Arbitre::challenge()
     std::cout << "FIN DU CHALLENGE\n\t"
               << _joueur1->nom()<< " gagne " << ((_numero_partie%2)? victoire_joueur_1 : victoire_joueur_2)
               << "\n\t"<< _joueur2->nom()<< " gagne " << ((_numero_partie%2) ? victoire_joueur_2 : victoire_joueur_1) << std::endl;
+    std::cout << "Coups invalide : " << coup_invalide.size() << "\n";
+      for (auto c : coup_invalide) {
+        std::cout << c << " ";
+      }
+      std::cout << std::endl;
+    std::cout << "Nombre de mutex non rendu :" << mutex_non_rendu.size() << std::endl;
+      for (auto m : mutex_non_rendu) {
+        std::cout << m << " ";
+      }
+      std::cout << std::endl;
 }
 
 int Arbitre::partie()
@@ -92,40 +104,51 @@ int Arbitre::partie()
 
       //  _coups[_numero_partie-1] = -1;
       _coups_mutex[_numero_partie-1].unlock();
-      
+
       std::thread thread_joueur(&Joueur::jouer,
 				((tour%2)? (_joueur1) :(_joueur2) ),
 				_jeu,
 				std::ref(_coups[_numero_partie-1]),
 				std::ref(_coups_mutex[_numero_partie-1]));
-      
+      _joueur_courant = (tour % 2) ? _joueur1 : _joueur2;
+
       std::this_thread::sleep_for (std::chrono::milliseconds(TEMPS_POUR_UN_COUP));
       //        std::this_thread::sleep_for (std::chrono::seconds(TEMPS_POUR_UN_COUP));
-      
+
       if (!_coups_mutex[_numero_partie-1].try_lock()) {
-	std::cerr <<  std::endl << "mutex non rendu " << std::endl;
-	try_lock = true;
+	      std::cerr <<  std::endl << "mutex non rendu " << std::endl;
+        if (_joueur_courant->nom() == "A") {
+          mutex_non_rendu.push_back(_numero_partie-1);
+        }
+	      try_lock = true;
       }
       else if(_coups[_numero_partie-1] == -1000) {
-	std::cerr << "coup invalide -1" << std::endl;
+	      std::cerr << "************************************coup invalide -1******************" << std::endl;
+        std::cerr << _coups[_numero_partie-1] << std::endl;
+        if (_joueur_courant->nom() == "A") {
+          coup_invalide.push_back(_coups[_numero_partie-1]);
+        }
       }
       else if(!_jeu.coup_licite(_coups[_numero_partie-1])) {
-	std::cerr << "coup invalide " << _coups[_numero_partie-1] << std::endl;
+	std::cerr << "************************************coup invalide ********************" << _coups[_numero_partie-1] << std::endl;
+        if (_joueur_courant->nom() == "A") {
+          coup_invalide.push_back(_coups[_numero_partie-1]);
+        }
       }
 
 thread_joueur.detach();
- 
+
       if(try_lock ||
 	 (_coups[_numero_partie-1] == -1000) ||
-	 !_jeu.coup_licite(_coups[_numero_partie-1]))   
+	 !_jeu.coup_licite(_coups[_numero_partie-1]))
 	{
 	  if(_jeu.partie_nulle())
 	    {
-	      std::cout << "partie nulle (" << tour << ")" << std::endl;  
+	      std::cout << "partie nulle (" << tour << ")" << std::endl;
 	    }
 	  else if(tour%2)
 	    {
-	      std::cout << _joueur2->nom() <<" gagne ! Nombre de tours : " << tour << std::endl;  
+	      std::cout << _joueur2->nom() <<" gagne ! Nombre de tours : " << tour << std::endl;
 	      return 2; // joueur 2 gagne
 	    }
 	  else
@@ -136,15 +159,15 @@ thread_joueur.detach();
 	}
 
       _coups[_numero_partie-1]+=1;
- 
-      if (tour%2 == 0) { 
+
+      if (tour%2 == 0) {
 	_coups[_numero_partie-1] = -_coups[_numero_partie-1];
       }
 
       _jeu.joue(_coups[_numero_partie-1]);
-      
+
       std::cout << ((tour%2) ? _joueur1->nom_abbrege() : _joueur2->nom_abbrege()) << _coups[_numero_partie-1] << std::endl << *(_jeu.plateau()) << std::endl;
-      
+
     }
   if (_jeu.partie_nulle())
     {

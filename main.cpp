@@ -14,9 +14,10 @@ int main()
 
     // création de l'Arbitre (graine , joueur 1, joueur 2 , nombre de parties)
     // Arbitre a (9999, player::RAND, player::BRUTAL_,100);
-    // Arbitre a (9999, player::BRUTAL_, player::A_,1);
-    // Arbitre a (9999, player::A_, player::RAND, 1);
+    // Arbitre a (9999, player::BRUTAL_, player::A_,100);
+    // Arbitre a (9999, player::A_, player::BRUTAL_,100);
     Arbitre a (9999, player::RAND, player::A_, 1);
+    // Arbitre a (9999, player::A_, player::RAND, 100);
     a.challenge();
 
     // EtatJeux e;

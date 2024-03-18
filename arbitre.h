@@ -34,6 +34,7 @@ class Arbitre
 private:
     std::shared_ptr<Joueur> _joueur1;
     std::shared_ptr<Joueur> _joueur2;
+    std::shared_ptr<Joueur> _joueur_courant;
 
     Jeu _jeu;
     std::vector<int> _coups;
