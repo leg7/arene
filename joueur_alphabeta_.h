@@ -106,9 +106,10 @@ struct EtatJeux
 	void test() noexcept;
 
 	i32 estimation(const NumeroJoueur joueurAEstimer) const noexcept;
-	bool estGagnant(const NumeroJoueur j)const;
+	bool estGagnant(const NumeroJoueur j) const noexcept;
 
-	int nbPiecesConsecutives(const NumeroJoueur j)const;
+	int nbPiecesConsecutives(const NumeroJoueur j) const noexcept;
+	bool fourchettePour(const NumeroJoueur joueurAEstimer) const noexcept;
 };
 
 class Joueur_AlphaBeta_ : public Joueur

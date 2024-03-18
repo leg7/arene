@@ -108,12 +108,16 @@ void EtatJeux::jouer(const Coup coup) noexcept
 
 void EtatJeux::jouerDebug(const Coup coup) noexcept
 {
+	printf("-------------------------------------------------------\n\n");
 	jouer(coup);
 	afficher();
-	std::cout << "Estimation : " << estimation(j0) << std::endl;
+	std::cout << "Estimation\t:\t" << estimation(j0) << std::endl;
+	std::cout << "Fourchette de j0\t:\t" << std::boolalpha << fourchettePour(j0) << std::endl;
+	std::cout << "Fourchette de j1\t:\t" << std::boolalpha << fourchettePour(j1) << std::endl;
 }
 
-bool EtatJeux::estGagnant(const NumeroJoueur num)const{
+bool EtatJeux::estGagnant(const NumeroJoueur num) const noexcept
+{
 	u64 etat = joueurs[num] << 22;
 
 	for (u64 i = 0; i < nCoups; i++) {
@@ -146,7 +150,8 @@ bool EtatJeux::estGagnant(const NumeroJoueur num)const{
 	return 0;
 }
 
-int EtatJeux::nbPiecesConsecutives(NumeroJoueur num)const{
+int EtatJeux::nbPiecesConsecutives(const NumeroJoueur num) const noexcept
+{
 	int nb_pieces_consecutives = 0;
 
 	for (u64 ligne = 0; ligne < nLignes; ligne++){
@@ -178,12 +183,38 @@ int EtatJeux::nbPiecesConsecutives(NumeroJoueur num)const{
 	return nb_pieces_consecutives;
 }
 
+bool EtatJeux::fourchettePour(const NumeroJoueur joueurAEstimer) const noexcept
+{
+	const NumeroJoueur adversaire = static_cast<NumeroJoueur>(joueurAEstimer ^ 1);
+	for (u8 ligne = 0; ligne < nLignes; ++ligne) {
+		const u64 etat = joueurs[joueurAEstimer] >> ligne * nColonnes;
+		const u64 etatAdv = joueurs[adversaire] >> ligne * nColonnes;
+
+		const u8 mask1    = 0b0'0111000;
+		const u8 maskAdv1 = 0b0'1000100;
+
+		const u8 mask2    = 0b0'0011100;
+		const u8 maskAdv2 = 0b0'0100010;
+
+		const u8 mask3    = 0b0'0001110;
+		const u8 maskAdv3 = 0b0'0010001;
+
+		if ((etat & mask1) == mask1 && (etatAdv & maskAdv1) == 0 ||
+		    (etat & mask2) == mask2 && (etatAdv & maskAdv2) == 0 ||
+		    (etat & mask3) == mask3 && (etatAdv & maskAdv3) == 0) {
+			return true;
+		}
+	}
+
+	return false;
+}
+
 i32 EtatJeux::estimation(const NumeroJoueur joueurAEstimer) const noexcept
 {
 	const NumeroJoueur adversaire = static_cast<NumeroJoueur>(joueurAEstimer ^ 1);
-	if (estGagnant(joueurAEstimer)) {
+	if (fourchettePour(joueurAEstimer) || estGagnant(joueurAEstimer)) {
 		return INT32_MAX;
-	} else if (estGagnant(adversaire)) {
+	} else if (fourchettePour(adversaire) || estGagnant(adversaire)) {
 		return INT32_MIN;
 	} else {
 		int nb0 = nbPiecesConsecutives(joueurAEstimer);
@@ -292,11 +323,10 @@ char Joueur_AlphaBeta_::nom_abbrege() const
 void Joueur_AlphaBeta_::recherche_coup(Jeu j, int &coup)
 {
 	// Joue le coup de l'adversaire pour actualiser notre plateau
-	// std::cout << "coup adversaire : " << coup << std::endl;
+	std::cout << "coup adversaire : " << coup << std::endl;
 	_joueurAEstimer = coup == -1000 ? EtatJeux::j0 : EtatJeux::j1;
 	_etat_jeux.jouer(static_cast<EtatJeux::Coup>(abs(coup) - 1));
-
-
+	_etat_jeux.afficher();
 
 	u8 profondeur = 3;
 	i32 meilleur_score = INT32_MIN;
@@ -325,8 +355,9 @@ void Joueur_AlphaBeta_::recherche_coup(Jeu j, int &coup)
 	}
 	// Joue notre coup pour actualiser notre plateau avant de rendre le mutex
 	_etat_jeux.jouer(meilleur_coup);
+	_etat_jeux.afficher();
 	// std::cout << "score : " << score << std::endl;
-	// std::cout << "Notre coup : " << static_cast<int>(meilleur_coup) + 1 << std::endl;
+	std::cout << "Notre coup : " << static_cast<int>(meilleur_coup) + 1 << std::endl;
 	// _etat_jeux.afficher();
 	coup = static_cast<int>(meilleur_coup);
 }
