@@ -356,8 +356,7 @@ void Joueur_AlphaBeta_::recherche_coup(Jeu j, int &coup)
 	// }
 	// std::cout << std::endl;
 
-	// for (u8 i = 0; i < taille; ++i) {
-	for (u8 i = 0; i < taille )
+	for (u8 i = 0; i < taille; ++i) {
 		EtatJeux tmp(_etat_jeux);
 		tmp.jouer(listCoupsPossibles[i]);
 		score = alpha_beta(profondeur, tmp, INT32_MIN, INT32_MAX, true);
