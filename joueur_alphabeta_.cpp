@@ -328,9 +328,8 @@ char Joueur_AlphaBeta_::nom_abbrege() const
 void Joueur_AlphaBeta_::recherche_coup(Jeu j, int &coup)
 {
 	// Joue le coup de l'adversaire pour actualiser notre plateau
-
-	// std::cout << "coup adversaire (struct Prof): " << coup << std::endl;
-	// std::cout << "coup adversaire (struct bitset): " << abs(coup) - 1 << std::endl;
+	clock_t top_depart = clock();
+	double temps_inter;
 
 	if (coup == -1000 && _firstTimeAround) {
 		_joueurAEstimer = EtatJeux::j0;
@@ -346,7 +345,13 @@ void Joueur_AlphaBeta_::recherche_coup(Jeu j, int &coup)
 		_etat_jeux.jouer(static_cast<EtatJeux::Coup>((abs(coup) - 1)));
 	}
 
-	const u8 profondeur = 5;
+
+	// std::cout << "joueurs[0] " << _etat_jeux.joueurs[0] << std::endl;
+	// std::cout << "joueurs[1] " << _etat_jeux.joueurs[1] << std::endl;
+	// _etat_jeux.afficher();
+
+
+	u8 profondeur = 8;
 	i32 meilleur_score = INT32_MIN;
 	i32 score;
 	EtatJeux::Coup listCoupsPossibles[EtatJeux::nCoups];
@@ -361,39 +366,161 @@ void Joueur_AlphaBeta_::recherche_coup(Jeu j, int &coup)
 	// }
 	// std::cout << std::endl;
 
-	for (u8 i = 0; i < taille; ++i) {
+	// for (u8 i = 0; i < taille; ++i) {
+	// 	EtatJeux tmp(_etat_jeux);
+	// 	tmp.jouer(listCoupsPossibles[i]);
+	// 	score = alpha_beta(profondeur, tmp, INT32_MIN, INT32_MAX, false);
+	// 	std::cout << "recherce::score : " << score << std::endl;
+	// 	if (meilleur_score < score) {
+	// 		meilleur_score = score;
+	// 		meilleur_coup = listCoupsPossibles[i];
+	// 	}
+	// }
+
+	i32 millieu = (int)taille / 2;
+	i32 reste = (int)taille % 2;
+
+	if (unsigned(taille) == 1) {
+		coup = static_cast<int>(listCoupsPossibles[0]);
+	}
+
+	if (reste) {
 		EtatJeux tmp(_etat_jeux);
-		tmp.jouer(listCoupsPossibles[i]);
-		score = alpha_beta(profondeur, tmp, INT32_MIN, INT32_MAX, true);
-		std::cout << "recherce::score : " << score << std::endl;
+		tmp.jouer(listCoupsPossibles[millieu]);
+		// score = alpha_beta(profondeur, tmp, INT32_MIN, INT32_MAX, false);
+		score = alpha_beta(top_depart, profondeur, tmp, INT32_MIN, INT32_MAX, false);
+		// std::cout << " coup : " << listCoupsPossibles[millieu] << " score : " << score  << std::endl;
 		if (meilleur_score < score) {
 			meilleur_score = score;
-			meilleur_coup = listCoupsPossibles[i];
+			meilleur_coup = listCoupsPossibles[millieu];
+		}
+
+		for (int i = 1; i <= millieu; ++i) {
+			temps_inter = (clock()-top_depart)/ (double)(CLOCKS_PER_SEC / 10000);
+			// std::cout << "Chrono : " << temps_inter << " s" << std::endl;
+		if (temps_inter >= 0.95) {
+			coup = static_cast<int>(meilleur_coup);
+			break;
+		}
+
+		  EtatJeux tmp2(_etat_jeux);
+			tmp2.jouer(listCoupsPossibles[millieu + i]);
+			// score = alpha_beta(profondeur, tmp2, INT32_MIN, INT32_MAX, false);
+			score = alpha_beta(top_depart, profondeur, tmp2, INT32_MIN, INT32_MAX, false);
+
+		// std::cout << " coup : " << listCoupsPossibles[millieu + i] << " score : " << score  << std::endl;
+			if (meilleur_score < score) {
+				meilleur_score = score;
+				meilleur_coup = listCoupsPossibles[millieu + i];
+			}
+
+			temps_inter = (clock()-top_depart)/ (double)(CLOCKS_PER_SEC / 10000);
+			// std::cout << "Chrono : " << temps_inter << " s" << std::endl;
+		if (temps_inter >= 0.95) {
+			coup = static_cast<int>(meilleur_coup);
+			break;
+		}
+
+		  EtatJeux tmp3(_etat_jeux);
+			tmp3.jouer(listCoupsPossibles[millieu - i]);
+			// score = alpha_beta(profondeur, tmp3, INT32_MIN, INT32_MAX, false);
+			score = alpha_beta(top_depart, profondeur, tmp3, INT32_MIN, INT32_MAX, false);
+
+		// std::cout << " coup : " << listCoupsPossibles[millieu - i] << " score : " << score  << std::endl;
+			if (meilleur_score < score) {
+				meilleur_score = score;
+				meilleur_coup = listCoupsPossibles[millieu - i];
+			}
+		}
+
+		for (int i = millieu * 2; i <= reste; ++i) {
+			temps_inter = (clock()-top_depart)/ (double)(CLOCKS_PER_SEC / 10000);
+			// std::cout << "Chrono : " << temps_inter << " s" << std::endl;
+		if (temps_inter >= 0.95) {
+			coup = static_cast<int>(meilleur_coup);
+			break;
+		}
+
+		  EtatJeux tmp4(_etat_jeux);
+			tmp4.jouer(listCoupsPossibles[i]);
+			// score = alpha_beta(profondeur, tmp4, INT32_MIN, INT32_MAX, false);
+			score = alpha_beta(top_depart, profondeur, tmp4, INT32_MIN, INT32_MAX, false);
+
+		// std::cout << " coup : " << listCoupsPossibles[i] << " score : " << score  << std::endl;
+			if (meilleur_score < score) {
+				meilleur_score = score;
+				meilleur_coup = listCoupsPossibles[i];
+			}
+		}
+	} else {
+
+		for (int i = 0; i < millieu; ++i) {
+			temps_inter = (clock()-top_depart)/ (double)(CLOCKS_PER_SEC / 10000);
+			// std::cout << "Chrono : " << temps_inter << " s" << std::endl;
+		if (temps_inter >= 0.95) {
+			coup = static_cast<int>(meilleur_coup);
+			break;
+		}
+
+			EtatJeux tmp(_etat_jeux);
+			tmp.jouer(listCoupsPossibles[millieu + i]);
+			// score = alpha_beta(profondeur, tmp, INT32_MIN, INT32_MAX, false);
+			score = alpha_beta(top_depart, profondeur, tmp, INT32_MIN, INT32_MAX, false);
+		// std::cout << " coup : " << listCoupsPossibles[millieu + i] << " score : " << score  << std::endl;
+			if (meilleur_score < score) {
+				meilleur_score = score;
+				meilleur_coup = listCoupsPossibles[millieu + i];
+			}
+
+			temps_inter = (clock()-top_depart)/ (double)(CLOCKS_PER_SEC / 10000);
+			// std::cout << "Chrono : " << temps_inter << " s" << std::endl;
+		if (temps_inter >= 0.95) {
+			coup = static_cast<int>(meilleur_coup);
+			break;
+		}
+
+			EtatJeux tmp2(_etat_jeux);
+			tmp2.jouer(listCoupsPossibles[millieu -i -1]);
+			// score = alpha_beta(profondeur, tmp2, INT32_MIN, INT32_MAX, false);
+			score = alpha_beta(top_depart, profondeur, tmp2, INT32_MIN, INT32_MAX, false);
+		// std::cout << " coup : " << listCoupsPossibles[millieu - i - 1] << " score : " << score  << std::endl;
+			if (meilleur_score < score) {
+				meilleur_score = score;
+				meilleur_coup = listCoupsPossibles[millieu - i -1];
+			}
 		}
 	}
+
 	// Joue notre coup pour actualiser notre plateau avant de rendre le mutex
 	_etat_jeux.jouer(meilleur_coup);
-	_etat_jeux.afficher();
-	std::cout << "score : " << score << std::endl;
+	// _etat_jeux.afficher();
+	// std::cout << "meilleur score : " << meilleur_score << std::endl;
 	// std::cout << "Notre coup (Struct prof): " << static_cast<int>(meilleur_coup)+1 << std::endl;
 	// std::cout << "Notre coup (Struct bitset): " << static_cast<int>(meilleur_coup) << std::endl;
 	coup = static_cast<int>(meilleur_coup);
 }
 
-i32 Joueur_AlphaBeta_::alpha_beta(const u8 profondeur, const EtatJeux &etat_jeux, i32 alpha, i32 beta, const bool isMax) {
+i32 Joueur_AlphaBeta_::alpha_beta(const clock_t td, const u8 profondeur, const EtatJeux &etat_jeux, i32 alpha, i32 beta, const bool isMax) {
 	// std::cout << "alpha_beta : " << std::endl;
 	// std::cout << " 		profondeur : " << unsigned(profondeur) << std::endl;
 	// std::cout << " 		Player : " << (isMax? "Max" : "Min") << std::endl;
 	// etat_jeux.afficher();
 
-	//TODO : chronometre pour finir à 9,5 milisecondre
-
 	//TODO : faire l'estimateur pour l'etat du jeu
 	if (unsigned(profondeur) == 0) {
-		i32 val = etat_jeux.estimation(_joueurAEstimer);
-		// std::cout << "profondeur break estimation : " << val << std::endl;
-		return val;
+		// std::cout << "profondeur break estimation " << std::endl;
+		return etat_jeux.estimation(_joueurAEstimer);
 	}
+
+	//TODO : chronometre pour finir à 9,5 milisecondre
+	double	temps_inter = (clock()-td)/ (double)(CLOCKS_PER_SEC / 10000);
+	// std::cout << "Chrono : " << temps_inter << " s" << std::endl;
+
+	if (temps_inter >= 0.95) {
+		// std::cout << "temps break" << std::endl;
+		return etat_jeux.estimation(_joueurAEstimer);
+	}
+
 
  	i32 score;
 
@@ -407,67 +534,255 @@ i32 Joueur_AlphaBeta_::alpha_beta(const u8 profondeur, const EtatJeux &etat_jeux
 
 	// std::cout << "alpha_beta test fin." << std::endl;
 
+	i32 millieu = (int)taille / 2;
+	i32 reste = (int)taille % 2;
+
 
 	if (isMax) {
 		// std::cout << "ab::max" << std::endl;
 		score = INT32_MIN;
 
-		for (u8 i = 0; i < taille; ++i) {
-			// std::cout << "ab::max::coup : " << unsigned(i) <<  std::endl;
-			EtatJeux tmp(etat_jeux);
-			tmp.jouer(listCoupsPossibles[i]);
-			// std::cout << "tmp etat" << std::endl;
-			// tmp.afficher();
-			// std::cout << "--------" << std::endl;
-			// std::cout << "===============ab::max avant rec=============" <<  std::endl;
-			score = std::max(score, alpha_beta(profondeur-1, tmp, alpha, beta, false));
-			// i32 val = alpha_beta(profondeur-1, tmp, alpha, beta, false);
-			// score = std::max(score,val);
-			// std::cout << "===============ab::max apres rec=============" <<  std::endl;
-			// std::cout << "ab::max::score : " << score <<  std::endl;
-			// std::cout << "ab::max::val : " << val <<  std::endl;
-			// std::cout << "ab::max::score : " << score <<  std::endl;
+		// for (u8 i = 0; i < taille; ++i) {
+		// 	// std::cout << "ab::max::coup : " << unsigned(i) <<  std::endl;
+		// 	EtatJeux tmp(etat_jeux);
+		// 	tmp.jouer(listCoupsPossibles[i]);
+		// 	// std::cout << "tmp etat" << std::endl;
+		// 	// tmp.afficher();
+		// 	// std::cout << "--------" << std::endl;
+		// 	// std::cout << "===============ab::max avant rec=============" <<  std::endl;
+		// 	score = std::max(score, alpha_beta(profondeur-1, tmp, alpha, beta, false));
+		// 	// i32 val = alpha_beta(profondeur-1, tmp, alpha, beta, false);
+		// 	// score = std::max(score,val);
+		// 	// std::cout << "===============ab::max apres rec=============" <<  std::endl;
+		// 	// std::cout << "ab::max::score : " << score <<  std::endl;
+		// 	// std::cout << "ab::max::val : " << val <<  std::endl;
+		// 	// std::cout << "ab::max::score : " << score <<  std::endl;
+    //
+		// 	// Beta coupure
+		// 	if (score >= beta) {
+		// 		// std::cout << "Beta coupure" << std::endl;
+		// 		return score;
+		// 	}
+    //
+		// 	if (score > alpha) {
+		// 		alpha = score;
+		// 	}
+		// }
+		// std::cout << "ab::max::fin" << std::endl;
 
-			// Beta coupure
+		if (unsigned(taille) == 1) {
+			EtatJeux tmp(etat_jeux);
+			tmp.jouer(listCoupsPossibles[0]);
+			// score = std::max(score, alpha_beta(profondeur-1, tmp, alpha, beta, false));
+			score = std::max(score, alpha_beta(temps_inter, profondeur-1, tmp, alpha, beta, false));
+			return score;
+		}
+
+		if (reste) {
+			EtatJeux tmp(etat_jeux);
+			tmp.jouer(listCoupsPossibles[millieu]);
+			// score = std::max(score, alpha_beta(profondeur-1, tmp, alpha, beta, false));
+			score = std::max(score, alpha_beta(temps_inter, profondeur-1, tmp, alpha, beta, false));
+
 			if (score >= beta) {
-				// std::cout << "Beta coupure" << std::endl;
 				return score;
 			}
 
 			if (score > alpha) {
 				alpha = score;
 			}
+
+			for (int i = 1; i <= millieu; ++i) {
+				EtatJeux tmp2(etat_jeux);
+				tmp2.jouer(listCoupsPossibles[millieu + i]);
+				// score = std::max(score, alpha_beta(profondeur-1, tmp2, alpha, beta, false));
+				score = std::max(score, alpha_beta(temps_inter, profondeur-1, tmp2, alpha, beta, false));
+
+				if (score >= beta) {
+					return score;
+				}
+
+				if (score > alpha) {
+					alpha = score;
+				}
+
+				EtatJeux tmp3(etat_jeux);
+				tmp3.jouer(listCoupsPossibles[millieu - i]);
+				// score = std::max(score, alpha_beta(profondeur-1, tmp3, alpha, beta, false));
+				score = std::max(score, alpha_beta(temps_inter, profondeur-1, tmp3, alpha, beta, false));
+
+				if (score >= beta) {
+					return score;
+				}
+
+				if (score > alpha) {
+					alpha = score;
+				}
+			}
+
+			for (int i = millieu * 2; i <= reste; ++i) {
+				EtatJeux tmp4(etat_jeux);
+				tmp4.jouer(listCoupsPossibles[i]);
+				// score = std::max(score, alpha_beta(profondeur-1, tmp4, alpha, beta, false));
+				score = std::max(score, alpha_beta(temps_inter, profondeur-1, tmp4, alpha, beta, false));
+
+				if (score >= beta) {
+					return score;
+				}
+
+				if (score > alpha) {
+					alpha = score;
+				}
+			}
+
+		} else {
+			for (int i = 0; i < millieu; ++i) {
+				EtatJeux tmp(etat_jeux);
+				tmp.jouer(listCoupsPossibles[millieu + i]);
+				// score = std::max(score, alpha_beta(profondeur-1, tmp, alpha, beta, false));
+				score = std::max(score, alpha_beta(temps_inter, profondeur-1, tmp, alpha, beta, false));
+
+				if (score >= beta) {
+					return score;
+				}
+
+				if (score > alpha) {
+					alpha = score;
+				}
+
+				EtatJeux tmp2(etat_jeux);
+				tmp2.jouer(listCoupsPossibles[millieu - i -1]);
+				// score = std::max(score, alpha_beta(profondeur-1, tmp2, alpha, beta, false));
+				score = std::max(score, alpha_beta(temps_inter, profondeur-1, tmp2, alpha, beta, false));
+
+				if (score >= beta) {
+					return score;
+				}
+
+				if (score > alpha) {
+					alpha = score;
+				}
+			}
 		}
-		// std::cout << "ab::max::fin" << std::endl;
+
 	} else {
 		// std::cout << "ab::min" << std::endl;
 		score = INT32_MAX;
 
-		for (u8 i = 0; i < taille; ++i) {
-			// std::cout << "ab::min::coup : " << unsigned(i) <<  std::endl;
-			EtatJeux tmp(etat_jeux);
-			tmp.jouer(listCoupsPossibles[i]);
-			// std::cout << "tmp etat" << std::endl;
-			// tmp.afficher();
-			// std::cout << "--------" << std::endl;
-			score = std::min(score, alpha_beta(profondeur-1, tmp, alpha, beta, true));
-			// i32 val = alpha_beta(profondeur-1, tmp, alpha, beta, true);
-			// score = std::min(score,val);
-			// std::cout << "ab::min::score : " << score <<  std::endl;
-			// std::cout << "ab::min::val : " << val <<  std::endl;
-			// std::cout << "ab::min::score : " << score <<  std::endl;
+		// for (u8 i = 0; i < taille; ++i) {
+		// 	// std::cout << "ab::min::coup : " << unsigned(i) <<  std::endl;
+		// 	EtatJeux tmp(etat_jeux);
+		// 	tmp.jouer(listCoupsPossibles[i]);
+		// 	// std::cout << "tmp etat" << std::endl;
+		// 	// tmp.afficher();
+		// 	// std::cout << "--------" << std::endl;
+		// 	score = std::min(score, alpha_beta(profondeur-1, tmp, alpha, beta, true));
+		// 	// i32 val = alpha_beta(profondeur-1, tmp, alpha, beta, true);
+		// 	// score = std::min(score,val);
+		// 	// std::cout << "ab::min::score : " << score <<  std::endl;
+		// 	// std::cout << "ab::min::val : " << val <<  std::endl;
+		// 	// std::cout << "ab::min::score : " << score <<  std::endl;
+    //
+		// 	// Alpha coupure
+		// 	if (score <= alpha) {
+		// 		// std::cout << "Alpha coupure" << std::endl;
+		// 		return score;
+		// 	}
+    //
+		// 	if (score < beta) {
+		// 		beta = score;
+		// 	}
+		// }
+		// // std::cout << "ab::min::fin" << std::endl;
 
-			// Alpha coupure
+		if (unsigned(taille) == 1) {
+			EtatJeux tmp(etat_jeux);
+			tmp.jouer(listCoupsPossibles[0]);
+			// score = std::min(score, alpha_beta(profondeur-1, tmp, alpha, beta, true));
+			score = std::min(score, alpha_beta(temps_inter, profondeur-1, tmp, alpha, beta, true));
+			return score;
+		}
+
+		if (reste) {
+			EtatJeux tmp(etat_jeux);
+			tmp.jouer(listCoupsPossibles[millieu]);
+			// score = std::min(score, alpha_beta(profondeur-1, tmp, alpha, beta, true));
+			score = std::min(score, alpha_beta(temps_inter, profondeur-1, tmp, alpha, beta, true));
+
 			if (score <= alpha) {
-				// std::cout << "Alpha coupure" << std::endl;
 				return score;
 			}
-
 			if (score < beta) {
 				beta = score;
 			}
+
+			for (int i = 1; i <= millieu; ++i) {
+				EtatJeux tmp2(etat_jeux);
+				tmp2.jouer(listCoupsPossibles[millieu + i]);
+				// score = std::min(score, alpha_beta(profondeur-1, tmp2, alpha, beta, true));
+				score = std::min(score, alpha_beta(temps_inter, profondeur-1, tmp2, alpha, beta, true));
+
+				if (score <= alpha) {
+					return score;
+				}
+				if (score < beta) {
+					beta = score;
+				}
+
+				EtatJeux tmp3(etat_jeux);
+				tmp3.jouer(listCoupsPossibles[millieu - i]);
+				// score = std::min(score, alpha_beta(profondeur-1, tmp3, alpha, beta, true));
+				score = std::min(score, alpha_beta(temps_inter, profondeur-1, tmp3, alpha, beta, true));
+
+				if (score <= alpha) {
+					return score;
+				}
+				if (score < beta) {
+					beta = score;
+				}
+			}
+
+			for (int i = millieu * 2; i <= reste; ++i) {
+				EtatJeux tmp(etat_jeux);
+				tmp.jouer(listCoupsPossibles[i]);
+				// score = std::min(score, alpha_beta(profondeur-1, tmp, alpha, beta, true));
+				score = std::min(score, alpha_beta(temps_inter, profondeur-1, tmp, alpha, beta, true));
+
+				if (score <= alpha) {
+					return score;
+				}
+				if (score < beta) {
+					beta = score;
+				}
+			}
+		} else {
+			for (int i = 0; i < millieu; ++i) {
+
+				EtatJeux tmp(etat_jeux);
+				tmp.jouer(listCoupsPossibles[millieu + i]);
+				// score = std::min(score, alpha_beta(profondeur-1, tmp, alpha, beta, true));
+				score = std::min(score, alpha_beta(temps_inter, profondeur-1, tmp, alpha, beta, true));
+
+				if (score <= alpha) {
+					return score;
+				}
+				if (score < beta) {
+					beta = score;
+				}
+
+				EtatJeux tmp2(etat_jeux);
+				tmp2.jouer(listCoupsPossibles[millieu - i - 1]);
+				// score = std::min(score, alpha_beta(profondeur-1, tmp2, alpha, beta, true));
+				score = std::min(score, alpha_beta(temps_inter, profondeur-1, tmp2, alpha, beta, true));
+
+				if (score <= alpha) {
+					return score;
+				}
+				if (score < beta) {
+					beta = score;
+				}
+			}
 		}
-		// std::cout << "ab::min::fin" << std::endl;
 	}
 
 	// std::cout << "alpha_beta fin." << std::endl;

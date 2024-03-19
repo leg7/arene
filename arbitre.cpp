@@ -117,7 +117,7 @@ int Arbitre::partie()
 
       if (!_coups_mutex[_numero_partie-1].try_lock()) {
 	      std::cerr <<  std::endl << "mutex non rendu " << std::endl;
-        if (_joueur_courant->nom() == "A") {
+        if (_joueur_courant->nom() == "AlphaBeta") {
           mutex_non_rendu.push_back(_numero_partie-1);
         }
 	      try_lock = true;
@@ -125,13 +125,13 @@ int Arbitre::partie()
       else if(_coups[_numero_partie-1] == -1000) {
 	      std::cerr << "************************************coup invalide -1******************" << std::endl;
         std::cerr << _coups[_numero_partie-1] << std::endl;
-        if (_joueur_courant->nom() == "A") {
+        if (_joueur_courant->nom() == "AlphaBeta") {
           coup_invalide.push_back(_coups[_numero_partie-1]);
         }
       }
       else if(!_jeu.coup_licite(_coups[_numero_partie-1])) {
 	std::cerr << "************************************coup invalide ********************" << _coups[_numero_partie-1] << std::endl;
-        if (_joueur_courant->nom() == "A") {
+        if (_joueur_courant->nom() == "AlphaBeta") {
           coup_invalide.push_back(_coups[_numero_partie-1]);
         }
       }

@@ -124,5 +124,5 @@ public:
   char nom_abbrege() const override;
 
   void recherche_coup(Jeu j, int & coup) override;
-  i32 alpha_beta(const u8 profondeur, const EtatJeux &etat_jeu, i32 alpha, i32 beta, const bool isMax);
+  i32 alpha_beta(const clock_t td, const u8 profondeur, const EtatJeux &etat_jeu, i32 alpha, i32 beta, const bool isMax);
 };
